@@ -1,0 +1,158 @@
+<!-- Versión para usuarios ya registrados/autenticados -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>SALUD TOTAL - Mi Cuenta</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <header>
+    <div class="contenedor-header">
+      <h1>SALUD TOTAL</h1>
+      <p>Centro Médico Integral</p>
+    </div>
+    <nav>
+      <ul>
+        <li><a class="boton-nav" href="#inicio">Inicio</a></li>
+        <li><a class="boton-nav" href="#servicios">Servicios</a></li>
+        <li><a class="boton-nav" href="#profesionales">Profesionales</a></li>
+        <li><a class="boton-nav" href="#solicitar-turno">Solicitar Turno</a></li>
+        <li><a class="boton-nav" href="#contacto">Contacto</a></li>
+        <li><a class="boton-nav" href="#misturnos">Mis Turnos</a></li>
+        <li><a class="boton-nav" href="Home_No_Login.html">Cerrar Sesión</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <section id="inicio">
+    <h2>Bienvenidos a SALUD TOTAL</h2>
+    <p>Brindamos atención médica de calidad con un equipo profesional dedicado a tu bienestar.</p>
+</section>
+
+  <!-- Sección de "Mis Turnos" -->
+  <section id="misturnos">
+    <h2>Mis Turnos</h2>
+    <div class="lista-turnos">
+      <div class="turno-item">
+        <p><strong>Especialidad:</strong> Clínica Médica</p>
+        <p><strong>Fecha:</strong> 14/05/2025</p>
+        <p><strong>Hora:</strong> 10:30</p>
+        <p><strong>Estado:</strong> <span class="estado estado-espera">En espera</span></p>
+        <button class="boton-secundario">Cancelar Turno</button>
+      </div>
+  
+      <div class="turno-item">
+        <p><strong>Especialidad:</strong> Ginecología</p>
+        <p><strong>Fecha:</strong> 16/05/2025</p>
+        <p><strong>Hora:</strong> 13:30</p>
+        <p><strong>Estado:</strong> <span class="estado estado-confirmado">Confirmado</span></p>
+      </div>
+  
+      <div class="turno-item">
+        <p><strong>Especialidad:</strong> Pediatría</p>
+        <p><strong>Fecha:</strong> 12/05/2025</p>
+        <p><strong>Hora:</strong> 09:00</p>
+        <p><strong>Estado:</strong> <span class="estado estado-cancelado">Cancelado</span></p>
+      </div>
+    </div>
+  </section>
+      <!-- Más turnos aquí -->
+    </div>
+  </section>
+ 
+<section id="servicios">
+    <h2>Servicios</h2>
+    <div class="contenedor-servicios">
+        <div class="tarjeta-servicio">
+            <h3>Clínica Médica</h3>
+            <p>Atención general para adultos con seguimiento personalizado.</p>
+        </div>
+        <div class="tarjeta-servicio">
+            <h3>Pediatría</h3>
+            <p>Cuidado integral para niños, control de crecimiento y vacunación.</p>
+        </div>
+        <div class="tarjeta-servicio">
+            <h3>Cardiología</h3>
+            <p>Estudios cardíacos, control de presión, electrocardiogramas y más.</p>
+        </div>
+        <div class="tarjeta-servicio">
+            <h3>Ginecología</h3>
+            <p>Consultas ginecológicas, estudios y prevención femenina.</p>
+        </div>
+        <div class="tarjeta-servicio">
+            <h3>Laboratorio</h3>
+            <p>Análisis clínicos con resultados rápidos y precisos.</p>
+        </div>
+    </div>
+</section>
+
+
+<section id="profesionales">
+    <h2>Profesionales</h2>
+    <p>Contamos con especialistas altamente calificados en distintas áreas de la salud.</p>
+</section>
+
+<!--<section id="turnos">
+    <h2>Solicitar Turno</h2>
+    <p>Puedes solicitar tu turno desde nuestra app web o llamando al (03777) 123456.</p>
+    <button class="boton-principal">Solicitar Turno</button>
+</section>-->
+
+<section id="solicitar-turno">
+  <h2>Solicitar Turno</h2>
+
+  <form class="form-turno">
+    <div class="grupo-form">
+      <label for="especialidad">Especialidad:</label>
+      <select id="especialidad" name="especialidad">
+        <option value="">Seleccione una especialidad</option>
+        <option value="clinica">Clínica Médica</option>
+        <option value="pediatria">Pediatría</option>
+        <option value="cardiologia">Cardiología</option>
+        <option value="ginecologia">Ginecología</option>
+      </select>
+    </div>
+
+    <div class="grupo-form">
+      <label for="profesional">Profesional:</label>
+      <select id="profesional" name="profesional">
+        <option value="">Seleccione un profesional</option>
+        <!-- Se cargan dinámicamente en un sistema real -->
+        <option value="1">Dra. María Pérez</option>
+        <option value="2">Dr. Juan López</option>
+      </select>
+    </div>
+
+    <div class="grupo-form">
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" name="fecha">
+    </div>
+
+    <div class="grupo-form">
+      <label for="horario">Horario:</label>
+      <select id="horario" name="horario">
+        <option value="">Seleccione un horario</option>
+        <option>08:00</option>
+        <option>09:30</option>
+        <option>11:00</option>
+        <option>15:30</option>
+        <option>17:00</option>
+      </select>
+    </div>
+
+    <button type="submit" class="boton-principal">Confirmar Turno</button>
+  </form>
+</section>
+
+<section id="contacto">
+  <h2>Contacto</h2>
+  <p>Email: contacto@saludtotal.com.ar</p>
+  <p>Dirección: Calle Salud 123, Goya, Corrientes</p>
+  <a href="Contacto.html" class="boton-secundario">Enviar Mensaje</a>
+</section>
+
+</script>
+</body>
+</html>
+

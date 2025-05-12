@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registrarse - SALUD TOTAL</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+  <section class="formulario-centro">
+    <h2>Crear Cuenta</h2>
+    <form class="form-turno" action="registro.php" method="post">
+      <div class="grupo-form">
+        <label for="nombre">Nombre completo:</label>
+        <input type="text" id="nombre" name="nombre" required>
+      </div>
+      <div class="grupo-form">
+        <label for="dni">DNI:</label>
+        <input type="text" id="dni" name="dni" pattern="\d{7,8}" maxlength="8" required>
+      </div>
+      <div class="grupo-form">
+        <label for="email">Correo electrónico:</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="grupo-form">
+        <label for="password">Contraseña:</label>
+        <input type="password" id="password" name="password" required>
+      </div>
+      <button type="submit" class="boton-principal">Crear Cuenta</button>
+      <p>¿Ya tenés cuenta? <a href="login.html">Iniciar sesión</a></p>
+    </form>
+  </section>
+</body>
+</html>
+
+<script>
+    document.querySelector('form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      
+      // Simulás validación y "registro exitoso"
+      // Acá podrías guardar datos en localStorage si querés
+      alert("Cuenta creada con éxito.");
+      window.location.href = "Registro_Exitoso.html";
+    });
+  </script>
+  
