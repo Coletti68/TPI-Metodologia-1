@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Solicitar Turno - SALUD TOTAL</title>
+  <link rel="stylesheet" href="/Proyecto/Front/estilos.css">
+</head>
+<body>
+  <header>
+    <h1>Solicitar Turno</h1>
+    <a href="/Proyecto/Front/Home_Login.html" class="boton-secundario">Volver al Inicio</a>
+  </header>
+
+ <section id="solicitar-turno">
+  <h2>Solicitar Turno</h2>
+
+  <form class="form-turno">
+    <div class="grupo-form">
+      <label for="especialidad">Especialidad:</label>
+      <select id="especialidad" name="especialidad">
+        <option value="">Seleccione una especialidad</option>
+        <option value="clinica">Clínica Médica</option>
+        <option value="pediatria">Pediatría</option>
+        <option value="cardiologia">Cardiología</option>
+        <option value="ginecologia">Ginecología</option>
+      </select>
+    </div>
+
+    <div class="grupo-form">
+      <label for="profesional">Profesional:</label>
+      <select id="profesional" name="profesional">
+        <option value="">Seleccione un profesional</option>
+        <!-- Se cargan dinámicamente en un sistema real -->
+        <option value="1">Dra. María Pérez</option>
+        <option value="2">Dr. Juan López</option>
+      </select>
+    </div>
+
+    <div class="grupo-form">
+      <label for="fecha">Fecha:</label>
+      <input type="date" id="fecha" name="fecha">
+    </div>
+
+    <div class="grupo-form">
+      <label for="horario">Horario:</label>
+      <select id="horario" name="horario">
+        <option value="">Seleccione un horario</option>
+        <option>08:00</option>
+        <option>09:30</option>
+        <option>11:00</option>
+        <option>15:30</option>
+        <option>17:00</option>
+      </select>
+    </div>
+
+    <button type="submit" class="boton-principal">Confirmar Turno</button>
+  </form>
+</section>
+</body>
+</html>

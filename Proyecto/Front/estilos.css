@@ -1,4 +1,4 @@
-/* ========== Reset General ========== */
+ /* ========== Reset General ========== */
 * {
     margin: 0;
     padding: 0;
@@ -112,6 +112,26 @@ a.boton-secundario:hover {
     gap: 20px;
     margin-top: 20px;
 }
+
+#botonTurno a:hover {
+  color: black; 
+}
+
+#botonTurno:hover {
+  background-color: lightgreen; 
+}
+
+#botonTurno {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
+
+#botonTurno a {
+  text-decoration: none;
+  color: black;
+}
+
 
 .tarjeta-servicio {
     background-color: #e3f2fd;
