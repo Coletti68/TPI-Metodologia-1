@@ -121,17 +121,16 @@ a.boton-secundario:hover {
   background-color: lightgreen; 
 }
 
-#botonTurno {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-}
-
 #botonTurno a {
   text-decoration: none;
   color: black;
 }
 
+#botonTurno {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+}
 
 .tarjeta-servicio {
     background-color: #e3f2fd;
