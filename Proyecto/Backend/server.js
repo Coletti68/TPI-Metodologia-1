@@ -2,7 +2,9 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = 3001;
+const PORT = 3002;
+const db = require('./db'); // Asegurate de que esto esté presente
+
 
 // 👉 Servir archivos estáticos desde la carpeta Front
 app.use(express.static(path.join(__dirname, '../Front')));
