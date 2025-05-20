@@ -54,7 +54,7 @@ section {
     text-align: center;
     background-color: white;
     margin: 10px auto;
-    max-width: 800px;
+    max-width: 1000px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
@@ -153,6 +153,39 @@ a.boton-secundario:hover {
 }
 
 .tarjeta-servicio p {
+    font-size: 14px;
+    color: #333;
+}
+
+/* ========== Profesionales ========== */
+.contenedor-Profesionales {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+.tarjeta-profesionales {
+    background-color: #e3f2fd;
+    padding: 20px;
+    border-radius: 10px;
+    width: 220px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    text-align: left;
+}
+
+.tarjeta-profesionales:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.tarjeta-profesionales h3 {
+    margin-bottom: 10px;
+    color: #1565c0;
+}
+
+.tarjeta-profesionales p {
     font-size: 14px;
     color: #333;
 }
