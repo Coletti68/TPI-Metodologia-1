@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Segoe UI', sans-serif;
-    background-color: #f5f5f5;
+    background-color: #e6f2ff;
     color: #333;
 }
 
@@ -248,12 +248,8 @@ a.boton-secundario:hover {
 }
 
 /* ===== Formulario ===== */
-.form-turno {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    text-align: left;
-}
+
+
 
 /* ===== Grupos de campos ===== */
 .grupo-form {
@@ -294,4 +290,93 @@ a.boton-secundario:hover {
 .form-turno .boton-principal {
     align-self: center;
     margin-top: 10px;
+}
+
+/* Aplica fondo al body de esta página */
+.body-turno {
+ margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-image: url('images/slider2.jpg'); /* Ajustá la ruta si es distinta */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  min-height: 100vh;
+  display: block;
+}
+
+/* Encabezado */
+.head-turno {
+  background-color: #1976d2;
+  color: white;
+  width: 100%;
+  padding: 20px 0;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.head-turno h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.boton-secundario {
+  margin-top: 10px;
+  display: inline-block;
+  background-color: white;
+  color: #1976d2;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Sección del formulario */
+#solicitar-turno {
+  background-color: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  max-width: 500px;
+  width: 90%;
+  margin-top: 40px;
+  text-align: left;
+}
+
+/* Subtítulo */
+#solicitar-turno h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Campos del formulario */
+.grupo-form {
+  margin-bottom: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+input, select {
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+/* Botón */
+.boton-principal {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 15px;
 }

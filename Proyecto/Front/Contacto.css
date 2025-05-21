@@ -1,0 +1,126 @@
+/* General */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #e6f2ff; /* Celeste claro */
+}
+
+/* Header */
+header {
+  background-color: #1976d2; /* Azul principal */
+  color: white;
+  text-align: center;
+  padding: 20px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+header p {
+  margin: 5px 0 0;
+  font-size: 16px;
+}
+
+nav {
+  background-color: #1565c0; /* Azul un poco más oscuro */
+}
+
+nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+nav ul li {
+  display: inline-block;
+}
+
+nav ul li a.boton-nav {
+  display: inline-block;
+  padding: 10px 20px;
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+nav ul li a.boton-nav:hover {
+  background-color: #0d47a1;
+  border-radius: 4px;
+}
+
+/* Sección de Contacto */
+#contacto {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+}
+
+form.form-turno {
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  width: 100%;
+}
+
+#contacto h2 {
+  text-align: center;
+  color: #1976d2;
+  margin-bottom: 30px;
+  font-size: 24px;
+}
+
+/* Campos del Formulario */
+.grupo-form {
+  margin-bottom: 20px;
+}
+
+.grupo-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.grupo-form input,
+.grupo-form select,
+.grupo-form textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  transition: border 0.3s;
+}
+
+.grupo-form input:focus,
+.grupo-form select:focus,
+.grupo-form textarea:focus {
+  border-color: #1976d2;
+  outline: none;
+}
+
+/* Botón */
+.boton-principal {
+  background-color: #1976d2;
+  color: white;
+  border: none;
+  padding: 12px;
+  width: 100%;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.boton-principal:hover {
+  background-color: #1565c0;
+}
