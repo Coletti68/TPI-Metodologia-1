@@ -8,5 +8,16 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Coletti68/TPI-Metodologia-1.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Coletti68/TPI-Metodologia-1/issues"
+  },
+  "homepage": "https://github.com/Coletti68/TPI-Metodologia-1#readme"
 }
