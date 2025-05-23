@@ -58,5 +58,37 @@
     <button type="submit" class="boton-principal">Confirmar Turno</button>
   </form>
 </section>
+<script>
+document.querySelector('.form-turno').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const especialidad = document.getElementById('especialidad').value;
+  const profesional = document.getElementById('profesional').value;
+  const fecha = document.getElementById('fecha').value;
+  const horario = document.getElementById('horario').value;
+
+  const pacienteId = localStorage.getItem("pacienteId"); // Debes guardar esto al hacer login
+
+  const response = await fetch('http://localhost:3002/api/turnos', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      paciente_id: pacienteId,
+      profesional_id: profesional,
+      especialidad_id: especialidad,
+      FechaTurno: `${fecha} ${horario}`,
+      motivo: "Consulta general"
+    })
+  });
+
+  if (response.ok) {
+    alert("✅ Turno solicitado con éxito");
+  } else {
+    alert("❌ Error al solicitar el turno");
+  }
+});
+</script>
 </body>
 </html>
