@@ -10,7 +10,6 @@ body {
     background-color: #e6f2ff;
     color: #333;
 }
-
 /* ========== Header & Navegación ========== */
 header {
     background-color: #1976d2;
@@ -47,7 +46,6 @@ nav ul li {
 .boton-nav:hover {
     background-color: #0d47a1;
 }
-
 /* ========== Secciones Generales ========== */
 section {
     padding: 40px 20px;
@@ -58,7 +56,6 @@ section {
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
-
 /* ========== Footer ========== */
 footer {
     text-align: center;
@@ -66,7 +63,6 @@ footer {
     background-color: #1976d2;
     color: white;
 }
-
 /* ========== Botones ========== */
 button.boton-principal {
     background-color: #1976d2;
@@ -103,7 +99,6 @@ button.boton-secundario:hover,
 a.boton-secundario:hover {
     background-color: #1e88e5;
 }
-
 /* ========== Servicios ========== */
 .contenedor-servicios {
     display: flex;
@@ -156,7 +151,6 @@ a.boton-secundario:hover {
     font-size: 14px;
     color: #333;
 }
-
 /* ========== Profesionales ========== */
 .contenedor-Profesionales {
     display: flex;
@@ -189,7 +183,6 @@ a.boton-secundario:hover {
     font-size: 14px;
     color: #333;
 }
-
 /* ========== Turnos ========== */
 .lista-turnos {
     display: flex;
@@ -206,7 +199,6 @@ a.boton-secundario:hover {
     box-shadow: 0 1px 4px rgba(0,0,0,0.1);
     text-align: left;
 }
-
 /* Estado del turno */
 .estado {
     font-weight: bold;
@@ -228,9 +220,6 @@ a.boton-secundario:hover {
     color: #c62828;
     background-color: #fddede;
 }
-
-
-
 /* ===== Contacto - Sección general ===== */
 #contacto {
     padding: 40px 20px;
@@ -246,24 +235,17 @@ a.boton-secundario:hover {
     margin-bottom: 25px;
     color: #1976d2;
 }
-
-/* ===== Formulario ===== */
-
-
-
 /* ===== Grupos de campos ===== */
 .grupo-form {
     display: flex;
     flex-direction: column;
 }
-
 /* ===== Etiquetas ===== */
 .grupo-form label {
     font-weight: bold;
     margin-bottom: 6px;
     color: #333;
 }
-
 /* ===== Inputs, selects y textarea ===== */
 .form-turno input,
 .form-turno select,
@@ -274,24 +256,20 @@ a.boton-secundario:hover {
     font-size: 14px;
     font-family: inherit;
 }
-
 /* ===== Select personalizado ===== */
 .form-turno select {
     background-color: white;
 }
-
 /* ===== Textarea ===== */
 .form-turno textarea {
     resize: vertical;
     min-height: 100px;
 }
-
 /* ===== Botón de enviar (usa clase existente) ===== */
 .form-turno .boton-principal {
     align-self: center;
     margin-top: 10px;
 }
-
 /* Aplica fondo al body de esta página */
 .body-turno {
  margin: 0;
@@ -304,7 +282,6 @@ a.boton-secundario:hover {
   min-height: 100vh;
   display: block;
 }
-
 /* Encabezado */
 .head-turno {
   background-color: #1976d2;
@@ -314,12 +291,10 @@ a.boton-secundario:hover {
   text-align: center;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
-
 .head-turno h1 {
   margin: 0;
   font-size: 28px;
 }
-
 .boton-secundario {
   margin-top: 10px;
   display: inline-block;
@@ -331,7 +306,6 @@ a.boton-secundario:hover {
   text-decoration: none;
   font-weight: bold;
 }
-
 /* Sección del formulario */
 #solicitar-turno {
   background-color: rgba(255, 255, 255, 0.95);
@@ -343,31 +317,26 @@ a.boton-secundario:hover {
   margin-top: 40px;
   text-align: left;
 }
-
 /* Subtítulo */
 #solicitar-turno h2 {
   text-align: center;
   margin-bottom: 20px;
 }
-
 /* Campos del formulario */
 .grupo-form {
   margin-bottom: 15px;
 }
-
 label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
 }
-
 input, select {
   width: 100%;
   padding: 8px;
   border-radius: 5px;
   border: 1px solid #ccc;
 }
-
 /* Botón */
 .boton-principal {
   background-color: #1976d2;

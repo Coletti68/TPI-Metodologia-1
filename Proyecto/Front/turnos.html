@@ -59,6 +59,7 @@
   </form>
 </section>
 <script>
+
 document.querySelector('.form-turno').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -73,15 +74,15 @@ document.querySelector('.form-turno').addEventListener('submit', async function 
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
-    },
+  },
     body: JSON.stringify({
       paciente_id: pacienteId,
       profesional_id: profesional,
       especialidad_id: especialidad,
       FechaTurno: `${fecha} ${horario}`,
       motivo: "Consulta general"
-    })
-  });
+  })
+});
 
   if (response.ok) {
     alert("✅ Turno solicitado con éxito");
