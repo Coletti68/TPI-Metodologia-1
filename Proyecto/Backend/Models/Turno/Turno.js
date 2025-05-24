@@ -87,7 +87,47 @@ const Turno = {
             console.error('❌ Error al obtener turnos ocupados:', error.message);
             throw error;
         }
+    },
+
+    // cancelarTurno
+    cancelarTurno: async (id_turno, paciente_id) => {
+        try {
+            const [resultado] = await db.execute(`
+                UPDATE Turno
+                SET estado = 'Cancelado'
+                WHERE id_turno = ? AND paciente_id = ?
+            `, [id_turno, paciente_id]);
+
+        if (resultado.affectedRows === 0) {
+            throw new Error('No se encontró el turno o no pertenece al paciente');
+        }
+
+           return { message: '✅ Turno cancelado correctamente' };
+        } catch (error) {
+           console.error('❌ Error al cancelar turno:', error.message);
+           throw error;
     }
+},
+
+    obtenerProximosTurnos: async (paciente_id) => {
+        try {
+            const [turnos] = await db.execute(`
+                SELECT T.id_turno, T.FechaTurno, T.HoraTurno, T.estado, E.nombreEspecialidad, P.nombre_completo AS nombreProfesional
+                FROM Turno T
+                JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
+                JOIN Profesional P ON T.profesional_id = P.id_profesional
+                WHERE T.paciente_id = ? AND T.estado IN ('En espera', 'Confirmado')
+                AND FechaTurno >= CURDATE()
+                ORDER BY T.FechaTurno ASC, T.HoraTurno ASC
+                LIMIT 1
+            `, [paciente_id]);
+
+            return turnos[0] || null;
+        } catch (error) {
+           console.error('❌ Error al obtener próximo turno:', error.message);
+           throw error;
+    }
+ }
 }
 
 module.exports = Turno;
