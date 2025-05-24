@@ -1,6 +1,6 @@
 node_modules/
 
-controllers/
+controladores:
 Responsabilidad:
 Contiene las funciones que ejecutan la lógica de negocio cuando se recibe una solicitud. Por ejemplo: crear un turno, listar turnos, modificar un paciente.
 
@@ -17,14 +17,14 @@ Insertar un nuevo turno
 
 🔧 Consejo: el controlador no debería contener consultas SQL directamente. Lo ideal es que llame a funciones del modelo.
 
-routes/
+rutas:
 Responsabilidad:
 Define los endpoints que puede consumir el frontend y qué controlador se ejecuta en cada uno.
 
-models/
+modelos:
 Responsabilidad:
 Contiene funciones que interactúan con la base de datos (consultas SQL). Idealmente, los controladores deberían llamar funciones del modelo, no escribir SQL directamente.
 
-utils/
+util:
 Responsabilidad:
 Funciones auxiliares que no son específicas de una entidad, pero ayudan a realizar tareas comunes.
