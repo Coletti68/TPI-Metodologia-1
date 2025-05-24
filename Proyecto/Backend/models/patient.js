@@ -1,4 +1,4 @@
-const db = require('../../db'); // Conexión a la base de datos
+const db = require('../db'); // Conexión a la base de datos
 const bcrypt = require('bcryptjs');
 
 const Patient = {

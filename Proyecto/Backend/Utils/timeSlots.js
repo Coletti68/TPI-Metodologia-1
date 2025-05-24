@@ -1,4 +1,5 @@
-/ backend/utils/timeSlots.js
+// backend/utils/timeSlots.js
+
 function generarBloquesDeTurno(horaInicio, horaFin, intervaloMin = 30) {
   const bloques = [];
   let inicio = new Date(`1970-01-01T${horaInicio}`);
