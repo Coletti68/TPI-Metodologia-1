@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Solicitar Turno - SALUD TOTAL</title>
-  <link rel="stylesheet" href="/Proyecto/Front/Home_Login.html">
   <link rel="stylesheet" href="estilos.css">
-
 </head>
 <body class="body-turno">
   <header class="head-turno">
@@ -13,83 +11,139 @@
     <a href="Home_Login.html" class="boton-secundario">Volver al Inicio</a>
   </header>
 
- <section id="solicitar-turno">
-  <h2>Solicitar Turno</h2>
+  <section id="solicitar-turno">
+    <h2>Solicitar Turno</h2>
+    <form class="form-turno" id="form-turno">
+      <div class="grupo-form">
+        <label for="especialidad">Especialidad:</label>
+        <select id="especialidad" required>
+          <option value="">Seleccione una especialidad</option>
+        </select>
+      </div>
 
-  <form class="form-turno">
-    <div class="grupo-form">
-      <label for="especialidad">Especialidad:</label>
-      <select id="especialidad" name="especialidad">
-        <option value="">Seleccione una especialidad</option>
-        <option value="clinica">Clínica Médica</option>
-        <option value="pediatria">Pediatría</option>
-        <option value="cardiologia">Cardiología</option>
-        <option value="ginecologia">Ginecología</option>
-      </select>
-    </div>
+      <div class="grupo-form">
+        <label for="profesional">Profesional:</label>
+        <select id="profesional" required>
+          <option value="">Seleccione un profesional</option>
+        </select>
+      </div>
 
-    <div class="grupo-form">
-      <label for="profesional">Profesional:</label>
-      <select id="profesional" name="profesional">
-        <option value="">Seleccione un profesional</option>
-        <!-- Se cargan dinámicamente en un sistema real -->
-        <option value="1">Dra. María Pérez</option>
-        <option value="2">Dr. Juan López</option>
-      </select>
-    </div>
+      <div class="grupo-form">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" required>
+      </div>
 
-    <div class="grupo-form">
-      <label for="fecha">Fecha:</label>
-      <input type="date" id="fecha" name="fecha">
-    </div>
+      <div class="grupo-form">
+        <label for="horario">Horario:</label>
+        <select id="horario" required>
+          <option value="">Seleccione un horario</option>
+        </select>
+      </div>
 
-    <div class="grupo-form">
-      <label for="horario">Horario:</label>
-      <select id="horario" name="horario">
-        <option value="">Seleccione un horario</option>
-        <option>08:00</option>
-        <option>09:30</option>
-        <option>11:00</option>
-        <option>15:30</option>
-        <option>17:00</option>
-      </select>
-    </div>
+      <button type="submit" class="boton-principal">Confirmar Turno</button>
+    </form>
+  </section>
 
-    <button type="submit" class="boton-principal">Confirmar Turno</button>
-  </form>
-</section>
-<script>
+  <script>
+    const API = 'http://localhost:3000/api';
+    const pacienteId = localStorage.getItem('pacienteId');
+    if (!pacienteId) {
+      alert("Primero iniciá sesión.");
+      window.location.href = "login.html";
+    }
 
-document.querySelector('.form-turno').addEventListener('submit', async function (e) {
-  e.preventDefault();
+    const especialidadSelect = document.getElementById('especialidad');
+    const profesionalSelect = document.getElementById('profesional');
+    const fechaInput = document.getElementById('fecha');
+    const horarioSelect = document.getElementById('horario');
 
-  const especialidad = document.getElementById('especialidad').value;
-  const profesional = document.getElementById('profesional').value;
-  const fecha = document.getElementById('fecha').value;
-  const horario = document.getElementById('horario').value;
+    // Cargar especialidades
+    async function cargarEspecialidades() {
+      const res = await fetch(`${API}/turnos/especialidades`);
+      const especialidades = await res.json();
+      especialidades.forEach(esp => {
+        const option = document.createElement('option');
+        option.value = esp.id_especialidad;
+        option.textContent = esp.nombre;
+        especialidadSelect.appendChild(option);
+      });
+    }
 
-  const pacienteId = localStorage.getItem("pacienteId"); // Debes guardar esto al hacer login
+    // Cargar profesionales según especialidad
+    especialidadSelect.addEventListener('change', async () => {
+      const idEspecialidad = especialidadSelect.value;
+      profesionalSelect.innerHTML = '<option value="">Seleccione un profesional</option>';
+      horarioSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+      if (!idEspecialidad) return;
 
-  const response = await fetch('http://localhost:3002/api/turnos', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-  },
-    body: JSON.stringify({
-      paciente_id: pacienteId,
-      profesional_id: profesional,
-      especialidad_id: especialidad,
-      FechaTurno: `${fecha} ${horario}`,
-      motivo: "Consulta general"
-  })
-});
+      const res = await fetch(`${API}/turnos/profesionales/${idEspecialidad}`);
+      const profesionales = await res.json();
+      profesionales.forEach(prof => {
+        const option = document.createElement('option');
+        option.value = prof.id_profesional;
+        option.textContent = `${prof.nombre} ${prof.apellido}`;
+        profesionalSelect.appendChild(option);
+      });
+    });
 
-  if (response.ok) {
-    alert("✅ Turno solicitado con éxito");
-  } else {
-    alert("❌ Error al solicitar el turno");
-  }
-});
-</script>
+    // Cargar horarios disponibles según profesional y fecha
+    async function cargarHorariosDisponibles() {
+      const profesionalId = profesionalSelect.value;
+      const fecha = fechaInput.value;
+      horarioSelect.innerHTML = '<option value="">Seleccione un horario</option>';
+
+      if (!profesionalId || !fecha) return;
+
+      const res = await fetch(`${API}/turnos/horarios-disponibles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ profesional_id: profesionalId, fecha })
+      });
+
+      const horarios = await res.json();
+      horarios.forEach(hora => {
+        const option = document.createElement('option');
+        option.value = hora.horaInicio;
+        option.textContent = `${hora.horaInicio} - ${hora.horaFin}`;
+        horarioSelect.appendChild(option);
+      });
+    }
+
+    fechaInput.addEventListener('change', cargarHorariosDisponibles);
+    profesionalSelect.addEventListener('change', cargarHorariosDisponibles);
+
+    // Enviar solicitud de turno
+    document.getElementById('form-turno').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const especialidadId = especialidadSelect.value;
+      const profesionalId = profesionalSelect.value;
+      const fecha = fechaInput.value;
+      const horario = horarioSelect.value;
+
+      const res = await fetch(`${API}/turnos`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paciente_id: pacienteId,
+          profesional_id: profesionalId,
+          especialidad_id: especialidadId,
+          FechaTurno: `${fecha} ${horario}`,
+          motivo: "Consulta general"
+        })
+      });
+
+      if (res.ok) {
+        alert("✅ Turno solicitado con éxito.");
+        window.location.href = "Home_Login.html";
+      } else {
+        const error = await res.json();
+        alert("❌ Error al solicitar el turno: " + (error.message || "Verificá los datos."));
+      }
+    });
+
+    // Inicialización
+    cargarEspecialidades();
+  </script>
 </body>
 </html>

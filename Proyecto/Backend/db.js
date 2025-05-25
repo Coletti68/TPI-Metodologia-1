@@ -1,19 +1,15 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-const connection = mysql.createConnection({
+const pool = mysql.createPool({
   host: 'localhost',
-  user: 'root',           // Su nombre de usuario de mysql
-  password: 'marcosroa03',           // contraseña de MySQL 
-  database: 'SaludTotalBDD' // nombre de la base de datos
+  user: 'root',
+  password: 'Facundo1',
+  database: 'SaludTotalBDD',
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-connection.connect((err) => {
-  if (err) {
-    console.error('❌ Error al conectar con la base de datos:', err);
-    return;
-  }
-  console.log('✅ Conexión exitosa con la base de datos SaludTotalBDD');
-});
+module.exports = pool;
 
-module.exports = connection;
 
