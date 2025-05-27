@@ -1,97 +1,123 @@
+
+//turnocontroller.js
 const Turno = require('../models/Turno');
-const { generarBloquesDeTurno } = require('../utils/timeSlots');
+const Especialidad = require('../models/especialidad');
+const Profesional = require('../models/profesional');
+const HorariosDisponibles = require('../models/horariosdisponibles');
 
-//  Crear un nuevo turno
-const crearTurno = async (req, res) => {
-  try {
-    const { paciente_id, profesional_id, especialidad_id, fechaTurno, horaTurno, motivo } = req.body;
+const turnoController = {
 
-    const disponible = await Turno.estaDisponible(profesional_id, especialidad_id, fechaTurno, horaTurno);
+    // 👉 Traer especialidades para el combo
+    obtenerEspecialidades: async (req, res) => {
+        try {
+            const especialidades = await Especialidad.obtenerTodas();
+            res.json(especialidades);
+        } catch (error) {
+            res.status(500).json({ error: 'Error al obtener especialidades' });
+        }
+    },
 
-    if (!disponible) {
-      return res.status(409).json({ error: ' Ese turno ya está ocupado' });
+    // 👉 Traer profesionales según especialidad
+    obtenerProfesionalesPorEspecialidad: async (req, res) => {
+        const { especialidad_id } = req.query;
+        try {
+            const profesionales = await Profesional.obtenerPorEspecialidad(especialidad_id);
+            res.json(profesionales);
+        } catch (error) {
+            res.status(500).json({ error: 'Error al obtener profesionales' });
+        }
+    },
+
+    // 👉 Ver horarios disponibles reales para un profesional y día
+     horariosDisponibles: async (req, res) => {
+        try {
+            const { profesional_id, especialidad_id, fecha } = req.query;
+
+            if (!profesional_id || !especialidad_id || !fecha) {
+                return res.status(400).json({ error: 'Faltan parámetros para obtener horarios' });
+            }
+
+            const horarios = await HorariosDisponibles.obtenerHorariosDisponibles(profesional_id, especialidad_id, fecha);
+            const turnosOcupados = await Turno.obtenerTurnosOcupados(profesional_id, especialidad_id, fecha);
+
+            const disponibles = [];
+
+            horarios.forEach(h => {
+                const inicio = h.HoraInicio;
+                const fin = h.HoraFin;
+                let current = new Date(`1970-01-01T${inicio}`);
+                const end = new Date(`1970-01-01T${fin}`);
+
+                while (current < end) {
+                    const horaStr = current.toTimeString().slice(0, 5); // "HH:MM"
+                    if (!turnosOcupados.includes(horaStr)) {
+                        disponibles.push(horaStr);
+                    }
+                    current = new Date(current.getTime() + 30 * 60000);
+                }
+            });
+
+            res.json({ horarios: disponibles });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Error al obtener horarios disponibles' });
+        }
+    },
+
+    // 👉 Crear turno si está disponible
+    crearTurno: async (req, res) => {
+        const { paciente_id, profesional_id, especialidad_id, fecha, hora } = req.body;
+
+        if (!paciente_id || !profesional_id || !especialidad_id || !fecha || !hora) {
+            return res.status(400).json({ error: 'Faltan datos para crear el turno' });
+        }
+
+        try {
+            const disponible = await Turno.estaDisponible(profesional_id, especialidad_id, fecha, hora);
+            if (!disponible) {
+                return res.status(409).json({ error: 'Ya existe un turno en esa fecha y hora' });
+            }
+
+            const nuevoTurno = await Turno.crear(paciente_id, profesional_id, especialidad_id, fecha, hora);
+            res.status(201).json({ message: 'Turno creado correctamente', turno: nuevoTurno });
+
+        } catch (error) {
+            res.status(500).json({ error: 'Error al crear el turno' });
+        }
+    },
+
+    // 👉 Historial de turnos
+    obtenerHistorialTurnos: async (req, res) => {
+        const { paciente_id } = req.params;
+        try {
+            const historial = await Turno.obtenerPorPaciente(paciente_id);
+            res.json(historial);
+        } catch (error) {
+            res.status(500).json({ error: 'Error al obtener historial de turnos' });
+        }
+    }
+};
+
+// 👉 Función auxiliar para generar los horarios disponibles en intervalos
+function generarIntervalos(inicio, fin, ocupados, intervaloMin = 30) {
+    const disponibles = [];
+    const [hInicio, mInicio] = inicio.split(':').map(Number);
+    const [hFin, mFin] = fin.split(':').map(Number);
+
+    let actual = new Date(0, 0, 0, hInicio, mInicio);
+    const finHora = new Date(0, 0, 0, hFin, mFin);
+
+    while (actual < finHora) {
+        const horaStr = actual.toTimeString().substring(0, 5) + ':00';
+
+        if (!ocupados.includes(horaStr)) {
+            disponibles.push(horaStr);
+        }
+
+        actual.setMinutes(actual.getMinutes() + intervaloMin);
     }
 
-    const result = await Turno.crear(paciente_id, profesional_id, especialidad_id, fechaTurno, horaTurno, motivo);
-    res.status(201).json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-//  Obtener historial de turnos de un paciente
-const historialTurnos = async (req, res) => {
-  try {
-    const { paciente_id } = req.params;
-    const turnos = await Turno.obtenerPorPaciente(paciente_id);
-    res.status(200).json(turnos);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-//  Ver horarios disponibles de un profesional para un día
-const horariosDisponibles = async (req, res) => {
-  try {
-    const { profesional_id, especialidad_id, fechaTurno } = req.query;
-
-    if (!profesional_id || !especialidad_id || !fechaTurno) {
-
-      return res.status(400).json({ error: 'Faltan parámetros requeridos' });
-    }
-
-    // Obtener el día de la semana (0: domingo, 1: lunes, ..., 6: sábado)
-    const diaSemana = new Date(fechaTurno).getDay();
-
-    const horarios = await Turno.obtenerHorariosDisponibles(profesional_id, especialidad_id, diaSemana);
-
-    if (horarios.length === 0) {
-      return res.status(404).json({ error: 'No hay horarios configurados para ese día' });
-    }
-
-    // Generar bloques por cada rango horario
-    const bloques = horarios.flatMap(h =>
-      generarBloquesDeTurno(h.HoraInicio, h.HoraFin)
-    );
-
-    // Obtener horas ya ocupadas
-    const ocupados = await Turno.obtenerTurnosOcupados(profesional_id, especialidad_id, fechaTurno);
-
-    // Filtrar bloques disponibles
-    const disponibles = bloques.filter(b => !ocupados.includes(b.horaInicio));
-
-    res.status(200).json(disponibles);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-//  Cancelar turno
-const cancelarTurno = async (req, res) => {
-  try {
-    const { id_turno, paciente_id } = req.body;
-    const result = await Turno.cancelarTurno(id_turno, paciente_id);
-    res.status(200).json(result);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-// ⏭ Obtener próximo turno confirmado o en espera
-const proximoTurno = async (req, res) => {
-  try {
-    const { paciente_id } = req.params;
-    const turno = await Turno.obtenerProximosTurnos(paciente_id);
-    res.status(200).json(turno);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-};
-
-module.exports = {
-  crearTurno,
-  historialTurnos,
-  horariosDisponibles,
-  cancelarTurno,
-  proximoTurno,
+    return disponibles;
 }
+
+module.exports = turnoController;

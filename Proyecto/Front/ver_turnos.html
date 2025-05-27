@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Mis Turnos</title>
   <link rel="stylesheet" href="Stylelogin.css" />
    <link rel="stylesheet" href="css/bootstrap.min.css"> 
@@ -95,7 +95,6 @@ p, span, li {
   <div class="header">
     <h1>Mis Turnos</h1>
     <a href="Home_Login.html" class="boton-volver">Volver al inicio</a>
-
   </div>
 
   <div class="contenedor">
@@ -105,88 +104,67 @@ p, span, li {
     </div>
     <div class="columna">
       <h2>Historial de Turnos</h2>
-      <div id="turnos-historial" class="mensaje">Aqui veras tu historial de turnos.</div>
+      <div id="turnos-historial" class="mensaje">Aquí verás tu historial de turnos.</div>
     </div>
   </div>
 
-<script>
-  document.addEventListener("DOMContentLoaded", async function () {
-    const pacienteId = localStorage.getItem("pacienteId");
+  <script>
+    document.addEventListener("DOMContentLoaded", async function () {
+      const pacienteId = localStorage.getItem("pacienteId");
 
-    if (!pacienteId) {
-      document.getElementById("turnos-activos").textContent = "Aqui veras tus turnos.";
-      return;
-    }
-
-    async function cargarTurnos() {
-      const response = await fetch(`http://localhost:3002/api/turnos/${pacienteId}`);
-      const turnos = await response.json();
-
-      const activos = turnos.filter(t => t.estado === 'pendiente');
-      const historico = turnos.filter(t => t.estado !== 'pendiente');
-
-      renderTurnos(activos, "turnos-activos", true); // Activos con botón
-      renderTurnos(historico, "turnos-historial", false);
-    }
-
-    function renderTurnos(lista, contenedorId, puedeCancelar) {
-      const contenedor = document.getElementById(contenedorId);
-      contenedor.innerHTML = "";
-
-      if (lista.length === 0) {
-        contenedor.textContent = "No hay turnos.";
+      if (!pacienteId) {
+        document.getElementById("turnos-activos").textContent = "Aquí verás tus turnos.";
         return;
       }
 
-      lista.forEach(turno => {
-        const div = document.createElement("div");
-        div.className = "turno-card";
-        div.innerHTML = `
-          <strong>Especialidad:</strong> ${turno.especialidad}<br>
-          <strong>Profesional:</strong> ${turno.nombre_profesional}<br>
-          <strong>Fecha:</strong> ${new Date(turno.FechaTurno).toLocaleString()}<br>
-          <strong>Estado:</strong> ${turno.estado}
-        `;
+      async function cargarTurnos() {
+        const response = await fetch(`/api/turnos/historial/${pacienteId}`);
+        const turnos = await response.json();
 
-        // Si puede cancelar, agregamos el botón
-        if (puedeCancelar) {
-          const btnCancelar = document.createElement("button");
-          btnCancelar.textContent = "Cancelar";
-          btnCancelar.style.marginTop = "10px";
-          btnCancelar.style.backgroundColor = "#e74c3c";
-          btnCancelar.style.color = "white";
-          btnCancelar.style.border = "none";
-          btnCancelar.style.padding = "6px 12px";
-          btnCancelar.style.borderRadius = "6px";
-          btnCancelar.style.cursor = "pointer";
+        const activos = turnos.filter(t => ['En espera', 'Confirmado'].includes(t.estado));
+        const historico = turnos.filter(t => t.estado === 'Atendido' || t.estado === 'Cancelado');
 
-          btnCancelar.onclick = async () => {
-            const confirmar = confirm("¿Estás seguro de cancelar este turno?");
-            if (!confirmar) return;
+        renderTurnos(activos, "turnos-activos", true);
+        renderTurnos(historico, "turnos-historial", false);
+      }
 
-            const response = await fetch(`http://localhost:3002/api/turnos/${turno.id}`, {
-              method: "PUT", // o DELETE si tu backend lo maneja así
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ estado: "cancelado" })
-            });
+      function renderTurnos(lista, contenedorId, puedeCancelar) {
+        const contenedor = document.getElementById(contenedorId);
+        contenedor.innerHTML = "";
 
-            if (response.ok) {
-              alert("✅ Turno cancelado con éxito.");
-              cargarTurnos();
-            } else {
-              alert("❌ Error al cancelar el turno.");
-            }
-          };
-
-          div.appendChild(btnCancelar);
+        if (lista.length === 0) {
+          contenedor.textContent = "No hay turnos.";
+          return;
         }
 
-        contenedor.appendChild(div);
-      });
-    }
+        lista.forEach(turno => {
+          const div = document.createElement("div");
+          div.className = "turno-card";
+          div.innerHTML = `
+            <strong>Especialidad:</strong> ${turno.nombreEspecialidad}<br>
+            <strong>Profesional:</strong> ${turno.nombreProfesional}<br>
+            <strong>Fecha:</strong> ${new Date(turno.FechaTurno).toLocaleDateString()}<br>
+            <strong>Hora:</strong> ${turno.HoraTurno}<br>
+            <strong>Estado:</strong> ${turno.estado}
+          `;
 
-    cargarTurnos();
-  });
-</script>
+          if (puedeCancelar) {
+            const btnCancelar = document.createElement("button");
+            btnCancelar.textContent = "Cancelar";
+            btnCancelar.onclick = async () => {
+              await fetch(`/api/turnos/cancelar/${turno.id_turno}`, { method: "PUT" });
+              alert("Turno cancelado.");
+              cargarTurnos();
+            };
+            div.appendChild(btnCancelar);
+          }
+
+          contenedor.appendChild(div);
+        });
+      }
+
+      cargarTurnos();
+    });
+  </script>
 </body>
 </html>
