@@ -105,29 +105,39 @@ async function cargarProfesionales() {
 
 async function enviarTurno(e) {
   e.preventDefault();
+
   const pacienteId = 1; // ⚠️ Debería venir de la sesión real
   const especialidadId = document.getElementById("especialidad").value;
   const profesionalId = document.getElementById("profesional").value;
   const fecha = document.getElementById("fecha").value;
   const hora = document.getElementById("horario").value;
 
-  const res = await fetch("/api/turnos/crear", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      paciente_id: pacienteId,
-      especialidad_id: especialidadId,
-      profesional_id: profesionalId,
-      fecha,
-      hora,
-      motivo: "Consulta general"
-    })
-  });
+  try {
+    const res = await fetch("/api/turnos/crear", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paciente_id: pacienteId,
+        especialidad_id: especialidadId,
+        profesional_id: profesionalId,
+        fecha,
+        hora
+      })
+    });
 
-  if (res.ok) {
-    alert("✅ Turno confirmado");
-    document.getElementById("form-turno").reset();
-  } else {
-    alert("❌ Error al confirmar turno");
+    const data = await res.json();
+
+    if (res.ok) {
+      alert("✅ Turno confirmado");
+      document.getElementById("form-turno").reset();
+    } else if (res.status === 409) {
+      alert("⚠️ Ese turno ya está ocupado. Elegí otro horario.");
+    } else {
+      alert("❌ Error al confirmar turno: " + data.mensaje || "Error desconocido");
+    }
+
+  } catch (error) {
+    console.error("Error al enviar turno:", error);
+    alert("❌ Error de conexión con el servidor");
   }
 }

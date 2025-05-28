@@ -129,39 +129,40 @@ p, span, li {
       }
 
       function renderTurnos(lista, contenedorId, puedeCancelar) {
-        const contenedor = document.getElementById(contenedorId);
-        contenedor.innerHTML = "";
+  const contenedor = document.getElementById(contenedorId);
+  contenedor.innerHTML = "";
 
-        if (lista.length === 0) {
-          contenedor.textContent = "No hay turnos.";
-          return;
-        }
+  if (lista.length === 0) {
+    contenedor.textContent = "No hay turnos.";
+    return;
+  }
 
-        lista.forEach(turno => {
-          const div = document.createElement("div");
-          div.className = "turno-card";
-          div.innerHTML = `
-            <strong>Especialidad:</strong> ${turno.nombreEspecialidad}<br>
-            <strong>Profesional:</strong> ${turno.nombreProfesional}<br>
-            <strong>Fecha:</strong> ${new Date(turno.FechaTurno).toLocaleDateString()}<br>
-            <strong>Hora:</strong> ${turno.HoraTurno}<br>
-            <strong>Estado:</strong> ${turno.estado}
-          `;
+  lista.forEach(turno => {
+    const div = document.createElement("div");
+    div.className = "turno-card";
+    div.innerHTML = `
+      <strong>Especialidad:</strong> ${turno.especialidad}<br>
+      <strong>Profesional:</strong> ${turno.profesional}<br>
+      <strong>Fecha:</strong> ${new Date(turno.fecha).toLocaleDateString()}<br>
+      <strong>Hora:</strong> ${turno.hora}<br>
+      <strong>Estado:</strong> ${turno.estado}
+    `;
 
-          if (puedeCancelar) {
-            const btnCancelar = document.createElement("button");
-            btnCancelar.textContent = "Cancelar";
-            btnCancelar.onclick = async () => {
-              await fetch(`/api/turnos/cancelar/${turno.id_turno}`, { method: "PUT" });
-              alert("Turno cancelado.");
-              cargarTurnos();
-            };
-            div.appendChild(btnCancelar);
-          }
+    if (puedeCancelar) {
+      const btnCancelar = document.createElement("button");
+      btnCancelar.textContent = "Cancelar";
+      btnCancelar.onclick = async () => {
+        await fetch(`/api/turnos/cancelar/${turno.id_turno}`, { method: "PUT" });
+        alert("Turno cancelado.");
+        cargarTurnos();
+      };
+      div.appendChild(btnCancelar);
+    }
 
-          contenedor.appendChild(div);
-        });
-      }
+    contenedor.appendChild(div);
+  });
+}
+
 
       cargarTurnos();
     });

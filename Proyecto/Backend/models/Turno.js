@@ -1,3 +1,4 @@
+//models/Turno.js//
 const db = require('../db');
 
 const Turno = {
@@ -21,6 +22,16 @@ const Turno = {
     // ✅ Crear un nuevo turno
     crear: async (paciente_id, profesional_id, especialidad_id, fecha, hora) => {
         try {
+              const [turnoExistente] = await db.execute(`
+            SELECT * FROM Turno 
+            WHERE profesional_id = ? AND FechaTurno = ? AND HoraTurno = ?
+        `, [profesional_id, fecha, hora]);
+
+        if (turnoExistente.length > 0) {
+            const error = new Error('Turno ya ocupado');
+            error.status = 409; // Código de error HTTP
+            throw error;
+        }
             const [resultado] = await db.execute(`
                 INSERT INTO Turno (paciente_id, profesional_id, especialidad_id, FechaTurno, HoraTurno, estado)
                 VALUES (?, ?, ?, ?, ?, 'En espera')
@@ -43,19 +54,28 @@ const Turno = {
 
     // ✅ Obtener todos los turnos de un paciente
     obtenerPorPaciente: async (paciente_id) => {
-        try {
-            const [turnos] = await db.execute(`
-                SELECT * FROM Turno 
-                WHERE paciente_id = ?
-                ORDER BY FechaTurno DESC, HoraTurno DESC
-            `, [paciente_id]);
+    try {
+        const [turnos] = await db.execute(`
+            SELECT 
+                T.id_turno AS id_turno,
+                T.FechaTurno AS fecha,
+                T.HoraTurno AS hora,
+                T.estado AS estado,
+                E.nombreEspecialidad AS especialidad,
+                P.nombre_completo AS profesional
+            FROM Turno T
+            JOIN Especialidades E ON T.especialidad_id = E.id_especialidad
+            JOIN Profesionales P ON T.profesional_id = P.id_profesional
+            WHERE T.paciente_id = ?
+            ORDER BY T.FechaTurno DESC, T.HoraTurno DESC
+        `, [paciente_id]);
 
-            return turnos;
-        } catch (error) {
-            console.error("❌ Error al obtener turnos del paciente:", error.message);
-            throw error;
-        }
-    },
+        return turnos;
+    } catch (error) {
+        console.error("❌ Error al obtener turnos del paciente:", error.message);
+        throw error;
+    }
+},
 
     // ✅ Obtener horarios disponibles de un profesional
     obtenerHorariosDisponibles: async (profesional_id, especialidad_id, fecha) => {
@@ -116,14 +136,21 @@ const Turno = {
     obtenerProximosTurnos: async (paciente_id) => {
         try {
             const [turnos] = await db.execute(`
-                SELECT T.id_turno, T.FechaTurno, T.HoraTurno, T.estado, E.nombreEspecialidad, P.nombre_completo AS nombreProfesional
-                FROM Turno T
-                JOIN Especialidades E ON T.especialidad_id = E.id_especialidad
-                JOIN Profesionales P ON T.profesional_id = P.id_profesional
-                WHERE T.paciente_id = ? AND T.estado IN ('En espera', 'Confirmado')
-                AND FechaTurno >= CURDATE()
-                ORDER BY T.FechaTurno ASC, T.HoraTurno ASC
-                LIMIT 1
+                SELECT 
+                T.id_turno AS id_turno,
+                T.FechaTurno AS fecha,
+                T.HoraTurno AS hora,
+                T.estado AS estado,
+                E.nombreEspecialidad AS especialidad,
+                P.nombre_completo AS profesional
+            FROM Turno T
+            JOIN Especialidades E ON T.especialidad_id = E.id_especialidad
+            JOIN Profesionales P ON T.profesional_id = P.id_profesional
+            WHERE T.paciente_id = ? 
+              AND T.estado IN ('En espera', 'Confirmado')
+              AND T.FechaTurno >= CURDATE()
+            ORDER BY T.FechaTurno ASC, T.HoraTurno ASC
+            LIMIT 1
             `, [paciente_id]);
 
             return turnos[0] || null;
