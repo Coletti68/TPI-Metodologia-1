@@ -95,29 +95,22 @@ const turnoController = {
         } catch (error) {
             res.status(500).json({ error: 'Error al obtener historial de turnos' });
         }
+    },
+
+  // 👉 Cancelar turno
+    cancelarTurno: async (req, res) => {
+        console.log('Llega petición para cancelar turno:', req.params.id_turno, req.body);
+        const { id_turno } = req.params;
+        const { paciente_id } = req.body;
+
+        try {
+            const resultado = await Turno.cancelarTurno(id_turno, paciente_id);
+            res.json(resultado);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
     }
 };
 
-// 👉 Función auxiliar para generar los horarios disponibles en intervalos
-function generarIntervalos(inicio, fin, ocupados, intervaloMin = 30) {
-    const disponibles = [];
-    const [hInicio, mInicio] = inicio.split(':').map(Number);
-    const [hFin, mFin] = fin.split(':').map(Number);
-
-    let actual = new Date(0, 0, 0, hInicio, mInicio);
-    const finHora = new Date(0, 0, 0, hFin, mFin);
-
-    while (actual < finHora) {
-        const horaStr = actual.toTimeString().substring(0, 5) + ':00';
-
-        if (!ocupados.includes(horaStr)) {
-            disponibles.push(horaStr);
-        }
-
-        actual.setMinutes(actual.getMinutes() + intervaloMin);
-    }
-
-    return disponibles;
-}
 
 module.exports = turnoController;

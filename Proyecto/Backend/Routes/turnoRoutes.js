@@ -9,5 +9,8 @@ router.get('/profesionales', turnoController.obtenerProfesionalesPorEspecialidad
 router.get('/historial/:paciente_id', turnoController.obtenerHistorialTurnos);
 router.get('/horarios-disponibles', turnoController.horariosDisponibles);
 router.post('/crear', turnoController.crearTurno);
+router.put('/cancelar/:id_turno', turnoController.cancelarTurno);
+
+
 
 module.exports = router;

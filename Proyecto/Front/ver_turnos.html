@@ -128,7 +128,7 @@ p, span, li {
         renderTurnos(historico, "turnos-historial", false);
       }
 
-      function renderTurnos(lista, contenedorId, puedeCancelar) {
+      function renderTurnos(lista, contenedorId, puedeCancelar,append = false) {
   const contenedor = document.getElementById(contenedorId);
   contenedor.innerHTML = "";
 
@@ -152,13 +152,26 @@ p, span, li {
       const btnCancelar = document.createElement("button");
       btnCancelar.textContent = "Cancelar";
       btnCancelar.onclick = async () => {
-        await fetch(`/api/turnos/cancelar/${turno.id_turno}`, { method: "PUT" });
-        alert("Turno cancelado.");
-        cargarTurnos();
-      };
+  const res = await fetch(`/api/turnos/cancelar/${turno.id_turno}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ paciente_id: pacienteId })  // 👈 CAMBIO AQUÍ
+  });
+
+  if (res.ok) {
+    turno.estado = 'Cancelado';
+    div.remove();
+    renderTurnos([turno], "turnos-historial", false);
+  } else {
+    alert("Error al cancelar el turno.");
+  }
+}
+
+
+    
+
       div.appendChild(btnCancelar);
     }
-
     contenedor.appendChild(div);
   });
 }
