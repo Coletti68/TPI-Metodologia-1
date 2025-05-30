@@ -15,6 +15,7 @@ app.use(express.json());
 // 👉 Importar rutas API
 const patientRoutes = require('./Routes/patientRoutes');
 const turnoRoutes = require('./Routes/turnoRoutes');
+const contactoRoutes = require('./Routes/contactoRoutes');
 
 // ✅ Servir archivos estáticos desde la carpeta Front
 app.use(express.static(path.join(__dirname, '../Front')));
@@ -27,6 +28,7 @@ app.get('/', (req, res) => {
 // ✅ Rutas de la API
 app.use('/api/pacientes', patientRoutes);
 app.use('/api/turnos', turnoRoutes);
+app.use('/api/contacto', contactoRoutes);
 
 // ✅ Iniciar servidor
 app.listen(PORT, () => {
