@@ -66,25 +66,35 @@ const turnoController = {
 
     // 👉 Crear turno si está disponible
     crearTurno: async (req, res) => {
-        const { paciente_id, profesional_id, especialidad_id, fecha, hora } = req.body;
+    const { paciente_id, profesional_id, especialidad_id, fecha, hora } = req.body;
 
-        if (!paciente_id || !profesional_id || !especialidad_id || !fecha || !hora) {
-            return res.status(400).json({ error: 'Faltan datos para crear el turno' });
+    if (!paciente_id || !profesional_id || !especialidad_id || !fecha || !hora) {
+        return res.status(400).json({ error: 'Faltan datos para crear el turno' });
+    }
+
+    try {
+        // Primero validar que no se pueda crear en fecha y hora pasada
+        const ahora = new Date();
+        const fechaHoraTurno = new Date(`${fecha}T${hora}:00`); // crea fecha+hora
+
+        if (fechaHoraTurno < ahora) {
+            return res.status(400).json({ error: 'No se puede agendar un turno en fecha y hora pasada' });
         }
 
-        try {
-            const disponible = await Turno.estaDisponible(profesional_id, especialidad_id, fecha, hora);
-            if (!disponible) {
-                return res.status(409).json({ error: 'Ya existe un turno en esa fecha y hora' });
-            }
-
-            const nuevoTurno = await Turno.crear(paciente_id, profesional_id, especialidad_id, fecha, hora);
-            res.status(201).json({ message: 'Turno creado correctamente', turno: nuevoTurno });
-
-        } catch (error) {
-            res.status(500).json({ error: 'Error al crear el turno' });
+        // Validar disponibilidad
+        const disponible = await Turno.estaDisponible(profesional_id, especialidad_id, fecha, hora);
+        if (!disponible) {
+            return res.status(409).json({ error: 'Ya existe un turno en esa fecha y hora' });
         }
-    },
+
+        const nuevoTurno = await Turno.crear(paciente_id, profesional_id, especialidad_id, fecha, hora);
+        res.status(201).json({ message: 'Turno creado correctamente', turno: nuevoTurno });
+
+    } catch (error) {
+        res.status(500).json({ error: 'Error al crear el turno' });
+    }
+},
+
 
     // 👉 Historial de turnos
     obtenerHistorialTurnos: async (req, res) => {

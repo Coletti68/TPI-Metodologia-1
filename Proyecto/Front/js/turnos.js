@@ -106,7 +106,7 @@ async function cargarProfesionales() {
 async function enviarTurno(e) {
   e.preventDefault();
 
-  const pacienteId = 1; // ⚠️ Debería venir de la sesión real
+  const pacienteId = localStorage.getItem("pacienteId"); // ✅ CORREGIDO
   const especialidadId = document.getElementById("especialidad").value;
   const profesionalId = document.getElementById("profesional").value;
   const fecha = document.getElementById("fecha").value;
@@ -117,7 +117,7 @@ async function enviarTurno(e) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        paciente_id: pacienteId,
+        paciente_id: parseInt(pacienteId), // opcional: parseInt para asegurarse
         especialidad_id: especialidadId,
         profesional_id: profesionalId,
         fecha,
@@ -133,7 +133,7 @@ async function enviarTurno(e) {
     } else if (res.status === 409) {
       alert("⚠️ Ese turno ya está ocupado. Elegí otro horario.");
     } else {
-      alert("❌ Error al confirmar turno: " + data.mensaje || "Error desconocido");
+      alert("❌ Error al crear turno: " + data.error || "Error desconocido");
     }
 
   } catch (error) {
