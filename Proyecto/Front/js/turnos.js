@@ -106,7 +106,7 @@ async function cargarProfesionales() {
 async function enviarTurno(e) {
   e.preventDefault();
 
-  const pacienteId = localStorage.getItem("pacienteId"); // ✅ CORREGIDO
+  const pacienteId = localStorage.getItem("pacienteId"); 
   const especialidadId = document.getElementById("especialidad").value;
   const profesionalId = document.getElementById("profesional").value;
   const fecha = document.getElementById("fecha").value;
