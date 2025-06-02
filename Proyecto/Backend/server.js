@@ -22,7 +22,7 @@ app.use(express.static(path.join(__dirname, '../Front')));
 
 // 👉 Ruta por defecto para el frontend
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../Front/Home_No_Login.html'));
+  res.sendFile(path.join(__dirname, '../Front/html/Home_No_Login.html'));
 });
 
 // ✅ Rutas de la API
