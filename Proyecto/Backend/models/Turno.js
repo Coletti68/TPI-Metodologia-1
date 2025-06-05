@@ -36,6 +36,10 @@ const Turno = {
                 INSERT INTO Turno (paciente_id, profesional_id, especialidad_id, FechaTurno, HoraTurno, estado)
                 VALUES (?, ?, ?, ?, ?, 'En espera')
             `, [paciente_id, profesional_id, especialidad_id, fecha, hora]);
+            await db.execute(`
+    INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
+    VALUES (?, ?, ?)
+`, [resultado.insertId, paciente_id, 'En espera']);
 
             return {
                 id_turno: resultado.insertId,
@@ -120,6 +124,11 @@ const Turno = {
                 SET estado = 'Cancelado'
                 WHERE id_turno = ? AND paciente_id = ?
             `, [id_turno, paciente_id]);
+            await db.execute(`
+    INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
+    VALUES (?, ?, ?)
+`, [id_turno, paciente_id, 'Cancelado']);
+
 
             if (resultado.affectedRows === 0) {
                 throw new Error('No se encontró el turno o no pertenece al paciente');
