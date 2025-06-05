@@ -64,8 +64,8 @@ const Turno = {
                 E.nombreEspecialidad AS especialidad,
                 P.nombre_completo AS profesional
             FROM Turno T
-            JOIN Especialidades E ON T.especialidad_id = E.id_especialidad
-            JOIN Profesionales P ON T.profesional_id = P.id_profesional
+            JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
+            JOIN Profesional P ON T.profesional_id = P.id_profesional
             WHERE T.paciente_id = ?
             ORDER BY T.FechaTurno DESC, T.HoraTurno DESC
         `, [paciente_id]);
@@ -82,7 +82,7 @@ const Turno = {
         try {
             const [horarios] = await db.execute(`
                 SELECT HoraInicio, HoraFin  
-                FROM HorariosDisponibles  
+                FROM HorarioDisponible 
                 WHERE profesional_id = ? AND especialidad_id = ?  
                 AND DiaSemana = ELT(WEEKDAY(STR_TO_DATE(?, '%Y-%m-%d')) + 1, 
                     'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')
@@ -144,7 +144,7 @@ const Turno = {
                 E.nombreEspecialidad AS especialidad,
                 P.nombre_completo AS profesional
             FROM Turno T
-            JOIN Especialidades E ON T.especialidad_id = E.id_especialidad
+            JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
             JOIN Profesionales P ON T.profesional_id = P.id_profesional
             WHERE T.paciente_id = ? 
               AND T.estado IN ('En espera', 'Confirmado')

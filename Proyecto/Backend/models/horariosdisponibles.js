@@ -1,11 +1,12 @@
+//models/horariodisponible.js
 const db = require('../db');
 
-const HorariosDisponibles = {
+const HorarioDisponible = {
     obtenerHorariosDisponibles: async (profesional_id, especialidad_id, fecha) => {
         try {
             const [horarios] = await db.execute(`
                 SELECT HoraInicio, HoraFin  
-                FROM HorariosDisponibles  
+                FROM HorarioDisponible 
                 WHERE profesional_id = ? AND especialidad_id = ?
                 AND DiaSemana = ELT(WEEKDAY(STR_TO_DATE(?, '%Y-%m-%d')) + 1, 
                     'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo')
@@ -19,4 +20,4 @@ const HorariosDisponibles = {
     }
 };
 
-module.exports = HorariosDisponibles;
+module.exports = HorarioDisponible;

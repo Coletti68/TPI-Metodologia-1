@@ -5,7 +5,7 @@ const Profesional = {
         try {
             const [profesionales] = await db.execute(`
                 SELECT P.id_profesional, P.nombre_completo
-                FROM Profesionales P
+                FROM Profesional P
                 JOIN ProfesionalEspecialidad PE ON P.id_profesional = PE.profesional_id
                 WHERE PE.especialidad_id = ?
             `, [especialidad_id]);

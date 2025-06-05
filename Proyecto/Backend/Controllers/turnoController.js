@@ -3,7 +3,7 @@
 const Turno = require('../models/Turno');
 const Especialidad = require('../models/especialidad');
 const Profesional = require('../models/profesional');
-const HorariosDisponibles = require('../models/horariosdisponibles');
+const HorarioDisponible = require('../models/horariosdisponibles');
 
 const turnoController = {
 
@@ -37,7 +37,7 @@ const turnoController = {
                 return res.status(400).json({ error: 'Faltan parámetros para obtener horarios' });
             }
 
-            const horarios = await HorariosDisponibles.obtenerHorariosDisponibles(profesional_id, especialidad_id, fecha);
+            const horarios = await HorarioDisponible.obtenerHorariosDisponibles(profesional_id, especialidad_id, fecha);
             const turnosOcupados = await Turno.obtenerTurnosOcupados(profesional_id, especialidad_id, fecha);
 
             const disponibles = [];

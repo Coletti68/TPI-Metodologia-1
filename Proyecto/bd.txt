@@ -20,25 +20,38 @@ CREATE TABLE Paciente (
     FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
 );
 
-CREATE TABLE Especialidades (
+CREATE TABLE Especialidad (
     id_especialidad INT AUTO_INCREMENT PRIMARY KEY,
-    nombreEspecialidad VARCHAR(100) NOT NULL UNIQUE
+    nombreEspecialidad VARCHAR(100) NOT NULL UNIQUE,
+    estado INT DEFAULT 1 -- 1: Activo, 0: Inactivo
+
 );
 
-CREATE TABLE Profesionales (
+CREATE TABLE Profesional (
     id_profesional INT AUTO_INCREMENT PRIMARY KEY,
     nombre_completo VARCHAR(100) NOT NULL,
-    especialidad_id INT NOT NULL,
+     especialidad_id INT NOT NULL,
+    dni VARCHAR(8) UNIQUE NOT NULL,
+    sexo ENUM('M', 'F') NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    estado INT DEFAULT 1, -- 1: activo
     rol_id INT NOT NULL DEFAULT 2, -- Asumiendo que 'profesional' tiene id_rol=2
-    FOREIGN KEY (especialidad_id) REFERENCES Especialidades(id_especialidad) ON DELETE CASCADE
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad) ON DELETE CASCADE,
+FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
+
 );
+
+
 
 CREATE TABLE ProfesionalEspecialidad (
     id INT PRIMARY KEY AUTO_INCREMENT,
     profesional_id INT NOT NULL UNIQUE,
     especialidad_id INT NOT NULL UNIQUE,
-    FOREIGN KEY (profesional_id) REFERENCES Profesionales(id_profesional) ON DELETE CASCADE,
-    FOREIGN KEY (especialidad_id) REFERENCES Especialidades(id_especialidad) ON DELETE CASCADE
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional) ON DELETE CASCADE,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad) ON DELETE CASCADE
 );
 
 CREATE TABLE Turno (
@@ -50,22 +63,22 @@ CREATE TABLE Turno (
     HoraTurno TIME NOT NULL,
     estado ENUM('En espera', 'Confirmado', 'Cancelado', 'Atendido') DEFAULT 'En espera',
     FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente),
-    FOREIGN KEY (profesional_id) REFERENCES Profesionales(id_profesional),
-    FOREIGN KEY (especialidad_id) REFERENCES Especialidades(id_especialidad)
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
 );
 
-CREATE TABLE HorariosDisponibles (
+CREATE TABLE HorarioDisponible (
     id_horario INT AUTO_INCREMENT PRIMARY KEY,
     profesional_id INT NOT NULL,
     especialidad_id INT NOT NULL,
     DiaSemana ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado') NOT NULL,
     HoraInicio TIME NOT NULL,
     HoraFin TIME NOT NULL,
-    FOREIGN KEY (profesional_id) REFERENCES Profesionales(id_profesional),
-    FOREIGN KEY (especialidad_id) REFERENCES Especialidades(id_especialidad)
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
 );
 
-CREATE TABLE HistorialTurnos (
+CREATE TABLE HistorialTurno (
   id_historial INT PRIMARY KEY AUTO_INCREMENT,
   turno_id INT NOT NULL,
   paciente_id INT NOT NULL,
@@ -88,17 +101,20 @@ CREATE TABLE Contacto (
 
 INSERT INTO Rol (id_rol, nombreRol) VALUES (1, 'admin'), (2, 'profesional'), (3, 'paciente');
 
-INSERT INTO Especialidades (nombreEspecialidad) VALUES 
+INSERT INTO Especialidad (nombreEspecialidad) VALUES 
 ('Clínica General'),
 ('Pediatría'),
 ('Cardiología'),
 ('Ginecología');
 
-INSERT INTO Profesionales (nombre_completo, especialidad_id) VALUES  
-('Dr. Carlos Diaz', 1),  
-('Dr. Lisandro López', 2),  
-('Dr. Pablo Perez', 3),  
-('Dra. Marisa Torales', 4); 
+INSERT INTO Profesional 
+(nombre_completo, especialidad_id, dni, sexo, email, password) 
+VALUES  
+('Dr. Carlos Diaz', 1, '12345678', 'M', 'cdiaz@example.com', 'hashed_password1'),
+('Dr. Lisandro López', 2, '87654321', 'M', 'llopez@example.com', 'hashed_password2'),
+('Dr. Pablo Perez', 3, '11223344', 'M', 'pperez@example.com', 'hashed_password3'),
+('Dra. Marisa Torales', 4, '44332211', 'F', 'mtorales@example.com', 'hashed_password4');
+
 
 INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id) VALUES 
 (1, 1), 
@@ -106,7 +122,7 @@ INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id) VALUES
 (2, 2),
 (3, 3);  -- Ana López (Pediatría y Cardiología)
 
-INSERT INTO HorariosDisponibles (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin) VALUES  
+INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin) VALUES  
 (1, 1, 'Lunes', '09:00:00', '12:00:00'),  
 (1, 1, 'Miércoles', '14:00:00', '18:00:00'),  
 (2, 2, 'Martes', '08:00:00', '12:00:00'),  

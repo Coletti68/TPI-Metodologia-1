@@ -16,6 +16,8 @@ app.use(express.json());
 const patientRoutes = require('./Routes/patientRoutes');
 const turnoRoutes = require('./Routes/turnoRoutes');
 const contactoRoutes = require('./Routes/contactoRoutes');
+const historialRoutes = require('./Routes/historialRoutes');
+
 
 // ✅ Servir archivos estáticos desde la carpeta Front
 app.use(express.static(path.join(__dirname, '../Front')));
@@ -29,6 +31,7 @@ app.get('/', (req, res) => {
 app.use('/api/pacientes', patientRoutes);
 app.use('/api/turnos', turnoRoutes);
 app.use('/api/contacto', contactoRoutes);
+app.use('/api/historial', historialRoutes);
 
 // ✅ Iniciar servidor
 app.listen(PORT, () => {
