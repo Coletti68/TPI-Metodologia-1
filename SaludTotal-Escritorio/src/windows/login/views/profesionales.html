@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Profesionales</title>
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="./pacientes.css">
+
+  <!-- Estilos de DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h1 { margin-bottom: 20px; }
+  </style>
+</head>
+
+<body class="admin">
+  <h1>Gestión de Profesionales</h1>
+  <button id="btnAgregarProfesional" style="margin-bottom: 20px; padding: 10px 16px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 4px;">
+    + Agregar Profesional
+  </button>
+
+  <div id="tablaProfesionales_wrapper" class="tabla-responsive contenedor-tabla">
+    <table id="tablaProfesionales" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>DNI</th>
+          <th>Nombre completo</th>
+          <th>Sexo</th>
+          <th>Email</th>
+          <th>Especialidades</th>
+          <th>Rol</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se carga por JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal para agregar profesional -->
+  <div id="modalAgregar" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); justify-content: center; align-items: center; z-index: 1000;">
+    <div style="background-color: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%;">
+      <h2>Nuevo Profesional</h2>
+      <form id="formNuevoProfesional">
+        <label>DNI:</label>
+        <input type="text" name="dni" id="dni" required pattern="\d{7,8}" title="Ingrese un DNI válido de 7 u 8 dígitos"><br><br>
+
+        <label>Nombre completo:</label>
+        <input type="text" name="nombre_completo" id="nombre_completo" required><br><br>
+
+        <label>Sexo:</label>
+        <select name="sexo" id="sexo" required>
+          <option value="">Seleccione</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Otro">Otro</option>
+        </select><br><br>
+
+        <label>Email:</label>
+        <input type="email" name="email" id="email" required><br><br>
+
+        <label>Especialidades:</label>
+        <input type="text" name="especialidades" id="especialidades" required><br><br>
+
+        <label>Rol:</label>
+        <input type="text" name="rol" id="rol" value="profesional" readonly><br><br>
+
+        <div style="text-align: right;">
+          <button type="submit" style="background-color: green; color: white; padding: 8px 12px; border: none; border-radius: 4px;">Guardar</button>
+          <button type="button" id="btnCerrarModal" style="margin-left: 10px;">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="profesionales.js"></script>
+
+  <script>
+    // Abrir el modal
+    document.getElementById('btnAgregarProfesional').addEventListener('click', () => {
+      document.getElementById('modalAgregar').style.display = 'flex';
+    });
+
+    // Cerrar el modal
+    document.getElementById('btnCerrarModal').addEventListener('click', () => {
+      document.getElementById('modalAgregar').style.display = 'none';
+    });
+  </script>
+</body>
+</html>

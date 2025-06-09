@@ -1,0 +1,72 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f4f8;
+}
+
+
+header .subtitulo {
+  font-size: 1.2em;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+header {
+  position: relative;
+  background-color: #1976d2;
+  color: white;
+  padding: 20px 20px 30px; /* más padding abajo */
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.logout {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  padding: 8px 16px;
+  background-color:rgb(194, 33, 28);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout:hover {
+  background-color: #c62828;
+}
+
+
+.content {
+  padding: 40px 20px;
+  max-width: 960px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.module {
+  background-color: white;
+  padding: 24px 16px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.module:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  background-color: #e3f2fd;
+  color: #0d47a1;
+}

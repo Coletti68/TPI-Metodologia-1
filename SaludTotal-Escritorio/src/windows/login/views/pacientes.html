@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Gestión de Pacientes</title>
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="./pacientes.css">
+
+  <!-- Estilos de DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+
+
+</head>
+
+<!-- Asignás el rol con una clase (ej: 'secretaria' o 'admin') -->
+<body class="secretaria">
+
+  <h1>Gestión de Pacientes</h1>
+
+  <div id="tablaPacientes_wrapper" class="tabla-responsive contenedor-tabla">
+    <table id="tablaPacientes" class="display" style="width:100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>DNI</th>
+          <th>Nombre completo</th>
+          <th>Sexo</th>
+          <th>Email</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Se carga por JS -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+  <script src="pacientes.js"></script>
+</body>
+</html>
+

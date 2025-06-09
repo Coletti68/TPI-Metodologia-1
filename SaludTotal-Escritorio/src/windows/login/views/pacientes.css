@@ -1,0 +1,184 @@
+body {
+  font-family: Arial;
+  padding: 20px;
+}
+
+h1 {
+  margin-bottom: 20px;
+}
+
+
+/* === Estilo general === */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f4f6f9;
+  color: #333;
+}
+
+h1 {
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* === Contenedor de las tablas === */
+.tabla-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.contenedor-tabla {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.1);
+}
+
+/* === Tabla DataTables === */
+table.dataTable {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+table.dataTable thead {
+  background-color: #007bff;
+  color: white;
+}
+
+table.dataTable thead th,
+table.dataTable tbody td {
+  padding: 14px 16px;
+  font-size: 15px;
+  text-align: left;
+}
+
+/* === Botones dentro de cualquier tabla === */
+table.dataTable button {
+  padding: 8px 10px;
+  margin: 0 2px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+table.dataTable button:hover {
+  opacity: 0.9;
+}
+
+/* === Estilos por tipo de botón === */
+.btn-editar {
+  background-color: #5bc0de;
+  color: white;
+}
+
+.btn-eliminar {
+  background-color: #d9534f;
+  color: white;
+}
+
+.btn-historial {
+  background-color: #5cb85c;
+  color: white;
+}
+
+/* === Controles de DataTables === */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter {
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: #444;
+}
+
+.dataTables_wrapper .dataTables_filter label,
+.dataTables_wrapper .dataTables_length label {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+  font-size: 14px;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+  width: 220px;
+}
+
+/* === Información y paginación === */
+.dataTables_wrapper .dataTables_info {
+  font-size: 13px;
+  color: #666;
+  margin-top: 12px;
+  font-style: italic;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+  border: 1px solid transparent;
+  padding: 6px 12px;
+  margin-left: 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  color: #007bff;
+  font-weight: 600;
+  background-color: transparent;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+  background-color: #007bff;
+  color: white !important;
+  border-color: #007bff;
+}
+
+/* === Responsive === */
+@media (max-width: 768px) {
+  body {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .contenedor-tabla {
+    padding: 10px;
+  }
+
+  .dataTables_wrapper .dataTables_filter input {
+    width: 100%;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter {
+    display: block;
+    width: 100%;
+    text-align: center;
+  }
+
+  .dataTables_wrapper .dataTables_info,
+  .dataTables_wrapper .dataTables_paginate {
+    text-align: center;
+    margin-top: 10px;
+  }
+
+  table.dataTable button {
+    margin-top: 5px;
+    width: 100%;
+  }
+}

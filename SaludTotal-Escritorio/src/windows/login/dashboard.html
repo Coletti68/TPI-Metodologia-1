@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta charset="UTF-8">
+  <title>Dashboard - Salud Total</title>
+  <link rel="stylesheet" href="./dashboard.css">
+</head>
+<body>
+<header>
+  <h1>Panel de Administración - Salud Total</h1>
+  <p id="bienvenida" class="subtitulo"></p>
+  <button class="logout" onclick="logout()">Cerrar sesión</button>
+</header>
+
+
+  <div class="content">
+    <div class="module" id="pacientes" onclick="abrirVentana('pacientes')">Gestión de Pacientes</div>
+    <div class="module" id="turnos" onclick="abrirVentana('turnos')">Gestión de Turnos</div>
+    <div class="module" id="profesionales" onclick="abrirVentana('profesionales')">Gestión de Profesionales</div>
+    <div class="module" id="horarios" onclick="abrirVentana('horarios')">Horarios Disponibles</div>
+    <div class="module" id="informes" onclick="abrirVentana('informes')">Reportes</div>
+    <div class="module" id="contacto" onclick="abrirVentana('contacto')">Mensajes del Sitio</div>
+  </div>
+  
+  <script src="dashboard.js"></script>
+</body>
+</html>

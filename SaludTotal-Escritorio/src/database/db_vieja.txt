@@ -1,0 +1,224 @@
+CREATE TABLE Rol (
+  id_rol INT PRIMARY KEY AUTO_INCREMENT,
+  nombreRol ENUM('admin', 'profesional', 'paciente', 'secretaria')
+);
+
+CREATE TABLE Paciente (
+    id_paciente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    dni VARCHAR(8) UNIQUE NOT NULL,
+    sexo ENUM('M', 'F') NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol_id INT NOT NULL DEFAULT 3, -- Asumiendo que 'paciente' tiene id_rol=3
+    estado INT DEFAULT 1, -- 1: activo, 0: inactivo
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
+);
+
+CREATE TABLE Profesional (
+    id_profesional INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    dni VARCHAR(8) UNIQUE NOT NULL,
+    sexo ENUM('M', 'F') NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol_id INT NOT NULL DEFAULT 2, -- Asumiendo que 'profesional' tiene id_rol=2
+    estado INT DEFAULT 1, -- 1: activo
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
+);
+
+CREATE TABLE Especialidad (
+  id_especialidad INT PRIMARY KEY AUTO_INCREMENT UNIQUE,
+  nombreEspecialidad VARCHAR(100),
+  estado INT DEFAULT 1 -- 1: Activo, 0: Inactivo
+);
+
+CREATE TABLE ProfesionalEspecialidad (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  profesional_id INT,
+  especialidad_id INT,
+  FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+  FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad),
+  UNIQUE (profesional_id, especialidad_id)
+);
+
+CREATE TABLE Turno (
+  id_turno INT PRIMARY KEY AUTO_INCREMENT,
+  paciente_id INT,
+  profesional_id INT,
+  especialidad_id INT,
+  FechaTurno DATETIME NOT NULL,
+  HoraTurno TIME,
+  fecha_solicitud DATETIME DEFAULT CURRENT_TIMESTAMP,
+  fecha_confirmacion DATETIME DEFAULT NULL,
+  estado ENUM('Confirmado', 'Cancelado', 'Reprogramado', 'Rechazado', 'En espera', 'Atendido') DEFAULT 'En espera',
+  motivo ENUM('Consulta general', 'Control', 'Estudios', 'Emergencia', 'Receta', 'Seguimiento') NOT NULL,
+    estado_logico INT DEFAULT 1, -- 1: activo, 0: inactivo
+  FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente),
+  FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+  FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
+);
+
+CREATE TABLE HorarioDisponible (
+  id_horario INT PRIMARY KEY AUTO_INCREMENT,
+  profesional_id INT,
+  especialidad_id INT,
+  DiaSemana INT, -- 1: Lunes, ..., 7: Domingo
+  HoraInicio TIME,
+  HoraFin TIME,
+  Estado INT DEFAULT 1, -- 1: Activo, 0: Inactivo
+  FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+  FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
+);
+
+CREATE TABLE HistorialTurnos (
+  id_historial INT PRIMARY KEY AUTO_INCREMENT,
+  turno_id INT NOT NULL,
+  paciente_id INT NOT NULL,
+  estado_nuevo ENUM('Confirmado', 'Cancelado', 'Reprogramado', 'Rechazado', 'En espera', 'Atendido') NOT NULL,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (turno_id) REFERENCES Turno(id_turno),
+  FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente)
+);
+
+CREATE TABLE Contacto (
+  id_contacto INT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(100) NOT NULL,
+  motivo ENUM('Sugerencia', 'Problema técnico', 'Queja o Reclamo', 'Otro') NOT NULL,
+  mensaje TEXT NOT NULL,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  respondido BOOLEAN DEFAULT FALSE,
+  paciente_id INT DEFAULT NULL,
+  FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente)
+);
+
+INSERT INTO Rol (id_rol, nombreRol) VALUES (1, 'admin'), (2, 'profesional'), (3, 'paciente');
+
+INSERT INTO Especialidad (nombreEspecialidad, estado) VALUES 
+('Clinica General', 1),
+('Cardiología', 1),
+('Ginecologia', 1),
+('Pediatria', 1);
+
+INSERT INTO Profesional (nombre_completo, dni, sexo, email, password, rol_id) VALUES 
+('Dr. Juan Pérez', '12345678', 'M', 'juanperez@saludtotal.com', 'hashedpassword1', 2),
+('Dra. Ana López', '87654321', 'F', 'analopez@saludtotal.com', 'hashedpassword2', 2);
+
+-- Juan Pérez es cardiólogo y neurólogo
+INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id) VALUES 
+(1, 1),  -- 1 = Clinico
+(1, 4);  -- 4 = Pediatra
+
+-- Ana López es pediatra y dermatóloga
+INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id) VALUES 
+(2, 2),  -- 2 = Cardiologa
+(2, 3);  -- 3 = Ginecologa
+
+-- Horarios para Dr. Juan Pérez (id_profesional=1)
+INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin, Estado) VALUES
+(1, 1, 1, '09:00:00', '12:00:00', 1),  -- Lunes, Clínica General
+(1, 1, 3, '14:00:00', '18:00:00', 1),  -- Miércoles, Clínica General
+(1, 4, 2, '08:00:00', '12:00:00', 1),  -- Martes, Pediatría
+(1, 4, 4, '13:00:00', '17:00:00', 1);  -- Jueves, Pediatría
+
+-- Horarios para Dra. Ana López (id_profesional=2)
+INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin, Estado) VALUES
+(2, 2, 1, '10:00:00', '13:00:00', 1),  -- Lunes, Cardiología
+(2, 2, 5, '15:00:00', '18:00:00', 1),  -- Viernes, Cardiología
+(2, 3, 2, '09:00:00', '12:00:00', 1),  -- Martes, Ginecología
+(2, 3, 4, '14:00:00', '17:00:00', 1);  -- Jueves, Ginecología
+
+-- Turno
+CREATE INDEX idx_turno_profesional ON Turno(profesional_id);
+CREATE INDEX idx_turno_paciente ON Turno(paciente_id);
+CREATE INDEX idx_turno_estado ON Turno(estado);
+CREATE INDEX idx_turno_fecha ON Turno(FechaTurno);
+
+-- Paciente y Profesional
+CREATE INDEX idx_paciente_email ON Paciente(email);
+CREATE INDEX idx_profesional_email ON Profesional(email);
+
+-- HistorialTurnos
+CREATE INDEX idx_historial_paciente ON HistorialTurnos(paciente_id);
+CREATE INDEX idx_historial_turno ON HistorialTurnos(turno_id);
+
+-- HorarioDisponible
+CREATE INDEX idx_horario_profesional ON HorarioDisponible(profesional_id);
+
+INSERT INTO Rol (id_rol, nombreRol) VALUES (4, 'secretaria');
+
+INSERT INTO Profesional (nombre_completo, dni, sexo, email, password, rol_id)
+VALUES ('Admin Test', '11223344', 'M', 'admin@saludtotal.com', '1234', 1);
+
+INSERT INTO Profesional (nombre_completo, dni, sexo, email, password, rol_id)
+VALUES ('Secretaria Test', '11223345', 'M', 'secretaria@saludtotal.com', '1234', 4);
+
+INSERT INTO Profesional (nombre_completo, dni, sexo, email, password, rol_id)
+VALUES ('Secretario Test', '11223355', 'M', 'secretario@saludtotal.com', '1234', 2);
+
+INSERT INTO Paciente (nombre_completo, dni, sexo, email, password, rol_id)
+VALUES 
+('Juan Pérez', '12345678', 'M', 'juan.perez@example.com', '1234', 3),
+('María Gómez', '23456789', 'F', 'maria.gomez@example.com', '1234', 3),
+('Carlos López', '34567890', 'M', 'carlos.lopez@example.com', '1234', 3),
+('Lucía Fernández', '45678901', 'F', 'lucia.fernandez@example.com', '1234', 3),
+('Pedro Ramírez', '56789012', 'M', 'pedro.ramirez@example.com', '1234', 3),
+('Ana Martínez', '67890123', 'F', 'ana.martinez@example.com', '1234', 3),
+('Sofía Torres', '78901234', 'F', 'sofia.torres@example.com', '1234', 3),
+('Martín Silva', '89012345', 'M', 'martin.silva@example.com', '1234', 3),
+('Valentina Ruiz', '90123456', 'F', 'valentina.ruiz@example.com', '1234', 3),
+('Diego Herrera', '01234567', 'M', 'diego.herrera@example.com', '1234', 3),
+('Camila Vega', '11223366', 'F', 'camila.vega@example.com', '1234', 3),
+('Tomás Ríos', '22334455', 'M', 'tomas.rios@example.com', '1234', 3),
+('Julieta Cabrera', '33445566', 'F', 'julieta.cabrera@example.com', '1234', 3),
+('Emilio Duarte', '44556677', 'M', 'emilio.duarte@example.com', '1234', 3),
+('Florencia Benítez', '55667788', 'F', 'florencia.benitez@example.com', '1234', 3),
+('Nicolás Méndez', '66778899', 'M', 'nicolas.mendez@example.com', '1234', 3);
+
+SELECT 
+  p.id_profesional AS id_profesional,
+  p.nombre_completo AS nombre_completo,
+  p.dni AS dni,
+  p.sexo AS sexo,
+  p.email AS email,
+  p.estado AS estado,
+  r.nombreRol AS rol,
+  GROUP_CONCAT(e.nombreEspecialidad ORDER BY e.nombreEspecialidad SEPARATOR ', ') AS especialidades
+FROM Profesional p
+JOIN Rol r ON p.rol_id = r.id_rol
+LEFT JOIN ProfesionalEspecialidad pe ON p.id_profesional = pe.profesional_id
+LEFT JOIN Especialidad e ON pe.especialidad_id = e.id_especialidad
+GROUP BY p.id_profesional, r.nombreRol;
+
+SELECT * FROM Profesional;
+
+-- Ver roles
+SELECT * FROM Rol;
+
+-- Ver especialidades
+SELECT * FROM Especialidad;
+
+SELECT 
+  p.id_profesional, 
+  p.nombre_completo, 
+  p.sexo, 
+  p.estado,
+  p.email,
+  r.nombreRol, 
+  e.nombreEspecialidad
+FROM 
+  Profesional p
+JOIN 
+  Rol r ON p.idRol = r.idRol
+JOIN 
+  Especialidad e ON p.id_especialidad = e.id_especialidad
+WHERE 
+  p.estado = 1;
+
+
+
+

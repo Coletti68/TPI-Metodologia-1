@@ -2,8 +2,9 @@
   "name": "tpi-metodologia-1",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "main.js",
   "scripts": {
+    "start": "electron SaludTotal-Escritorio/src/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -11,7 +12,10 @@
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",
-    "express": "^5.1.0"
+    "cors": "^2.8.5",
+    "electron": "^36.4.0",
+    "express": "^5.1.0",
+    "mysql2": "^3.14.1"
   },
   "repository": {
     "type": "git",
