@@ -1,16 +1,174 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
-  <title>Módulo: Turnos</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { color: #2c3e50; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Turnos</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        thead tr {
+            background-color: #34495e;
+            color: white;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: center;
+            border-bottom: 1px solid #e1e4e8;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f9fafb;
+        }
+
+        tbody tr:hover {
+            background-color: #dceefc;
+            cursor: pointer;
+        }
+
+        td.estado-activo {
+            color: #27ae60;
+            font-weight: 600;
+        }
+
+        td.estado-pendiente {
+            color: #f39c12;
+            font-weight: 600;
+        }
+
+        td.estado-cancelado {
+            color: #c0392b;
+            font-weight: 600;
+        }
+
+        button {
+            background-color: #2980b9;
+            border: none;
+            color: white;
+            padding: 6px 12px;
+            margin: 2px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1c5980;
+        }
+
+        button.btn-editar {
+            background-color: #27ae60;
+        }
+
+        button.btn-editar:hover {
+            background-color: #1f8f4a;
+        }
+
+        button.btn-eliminar {
+            background-color: #c0392b;
+        }
+
+        button.btn-eliminar:hover {
+            background-color: #8e2a21;
+        }
+
+        @media (max-width: 768px) {
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tbody tr {
+                margin-bottom: 1rem;
+                border-radius: 6px;
+                box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+                background: white;
+                padding: 15px;
+            }
+
+            tbody td {
+                border: none;
+                padding: 10px 0;
+                text-align: right;
+                position: relative;
+            }
+
+            tbody td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                font-weight: 700;
+                text-transform: uppercase;
+                color: #34495e;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Módulo: Turnos</h1>
-  <p>Contenido inicial para el módulo de Turnos.</p>
+    <h1>Gestión de Turnos</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Paciente</th>
+                <th>Profesional</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tbodyTurnos">
+            <!-- Ejemplo de fila (puede ser generado dinámicamente) -->
+            <tr>
+                <td data-label="ID">1</td>
+                <td data-label="Paciente">Juan Pérez</td>
+                <td data-label="Profesional">Dr. García</td>
+                <td data-label="Fecha">2025-06-15</td>
+                <td data-label="Hora">14:30</td>
+                <td data-label="Estado" class="estado-activo">Activo</td>
+                <td data-label="Acciones">
+                    <button class="btn-editar">Editar</button>
+                    <button class="btn-eliminar">Eliminar</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <script src="gestionTurnos.js"></script>
 </body>
 </html>
