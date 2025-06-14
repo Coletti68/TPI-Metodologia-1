@@ -1,0 +1,144 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+}
+
+/* Body y fuente general */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 20px;
+  background-color: #f5f7fa;
+  color: #333;
+}
+
+/* Título principal */
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+/* Tabla principal */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* Encabezado de tabla */
+thead tr {
+  background-color: #34495e;
+  color: white;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+}
+
+/* Celdas encabezado */
+th, td {
+  padding: 12px 15px;
+  text-align: center;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+/* Filas alternas para mejor legibilidad */
+tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* Hover en filas para interactividad */
+tbody tr:hover {
+  background-color: #dceefc;
+  cursor: pointer;
+}
+
+/* Estado con colores distintivos */
+td.estado-activo {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+td.estado-pendiente {
+  color: #f39c12;
+  font-weight: 600;
+}
+
+td.estado-cancelado {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* Botones estilo general */
+button {
+  background-color: #2980b9;
+  border: none;
+  color: white;
+  padding: 6px 12px;
+  margin: 2px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #1c5980;
+}
+
+/* Botones con roles diferentes */
+button.btn-editar {
+  background-color: #27ae60;
+}
+
+button.btn-editar:hover {
+  background-color: #1f8f4a;
+}
+
+button.btn-eliminar {
+  background-color: #c0392b;
+}
+
+button.btn-eliminar:hover {
+  background-color: #8e2a21;
+}
+
+/* Responsive básico */
+@media (max-width: 768px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  tbody tr {
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+    background: white;
+    padding: 15px;
+  }
+
+  tbody td {
+    border: none;
+    padding: 10px 0;
+    text-align: right;
+    position: relative;
+  }
+
+  tbody td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #34495e;
+  }
+}
