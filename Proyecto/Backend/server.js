@@ -9,25 +9,28 @@ const db = require('./db'); // Importar utilidades de DB
 app.use(cors());
 app.use(express.json());
 
-const patientRoutes = require('./Routes/patientRoutes');
-const turnoRoutes = require('./Routes/turnoRoutes');
-const contactoRoutes = require('./Routes/contactoRoutes');
-const historialRoutes = require('./Routes/historialRoutes');
-
 app.use(express.static(path.join(__dirname, '../Front')));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../Front/html/Home_No_Login.html'));
 });
 
-app.use('/api/pacientes', patientRoutes);
-app.use('/api/turnos', turnoRoutes);
-app.use('/api/contacto', contactoRoutes);
-app.use('/api/historial', historialRoutes);
-
 // 🔁 Función asíncrona para iniciar el servidor y conectar a la BD
 async function startServer() {
   try {
     await db.conectar(); // ✅ Establecer conexión al pool
+
+    // import Rutas
+    const patientRoutes = require('./Routes/patientRoutes');
+    const turnoRoutes = require('./Routes/turnoRoutes');
+    const contactoRoutes = require('./Routes/contactoRoutes');
+    const historialRoutes = require('./Routes/historialRoutes');
+
+    // Usar las rutas
+    app.use('/api/pacientes', patientRoutes);
+    app.use('/api/turnos', turnoRoutes);
+    app.use('/api/contacto', contactoRoutes);
+    app.use('/api/historial', historialRoutes);
+
     app.listen(PORT, () => {
       console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
     });
@@ -37,4 +40,4 @@ async function startServer() {
   }
 }
 
-startServer(); // 🟢 Ejecutar servidor
+startServer();

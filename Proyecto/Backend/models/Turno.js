@@ -1,11 +1,9 @@
-//models/Turno.js//
-const db = require('../db');
+const pool = require('../db').getPool();
 
 const Turno = {
-    // ✅ Verifica si un turno está disponible
     estaDisponible: async (profesional_id, especialidad_id, fecha, hora) => {
         try {
-            const [result] = await db.execute(`
+            const [result] = await pool.execute(`
                 SELECT COUNT(*) AS cantidad
                 FROM Turno
                 WHERE profesional_id = ? AND especialidad_id = ? AND FechaTurno = ? AND HoraTurno = ?
@@ -19,27 +17,28 @@ const Turno = {
         }
     },
 
-    // ✅ Crear un nuevo turno
     crear: async (paciente_id, profesional_id, especialidad_id, fecha, hora) => {
         try {
-              const [turnoExistente] = await db.execute(`
-            SELECT * FROM Turno 
-            WHERE profesional_id = ? AND FechaTurno = ? AND HoraTurno = ?
-        `, [profesional_id, fecha, hora]);
+            const [turnoExistente] = await pool.execute(`
+                SELECT * FROM Turno 
+                WHERE profesional_id = ? AND FechaTurno = ? AND HoraTurno = ?
+            `, [profesional_id, fecha, hora]);
 
-        if (turnoExistente.length > 0) {
-            const error = new Error('Turno ya ocupado');
-            error.status = 409; // Código de error HTTP
-            throw error;
-        }
-            const [resultado] = await db.execute(`
+            if (turnoExistente.length > 0) {
+                const error = new Error('Turno ya ocupado');
+                error.status = 409;
+                throw error;
+            }
+
+            const [resultado] = await pool.execute(`
                 INSERT INTO Turno (paciente_id, profesional_id, especialidad_id, FechaTurno, HoraTurno, estado)
                 VALUES (?, ?, ?, ?, ?, 'En espera')
             `, [paciente_id, profesional_id, especialidad_id, fecha, hora]);
-            await db.execute(`
-    INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
-    VALUES (?, ?, ?)
-`, [resultado.insertId, paciente_id, 'En espera']);
+
+            await pool.execute(`
+                INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
+                VALUES (?, ?, ?)
+            `, [resultado.insertId, paciente_id, 'En espera']);
 
             return {
                 id_turno: resultado.insertId,
@@ -56,35 +55,33 @@ const Turno = {
         }
     },
 
-    // ✅ Obtener todos los turnos de un paciente
     obtenerPorPaciente: async (paciente_id) => {
-    try {
-        const [turnos] = await db.execute(`
-            SELECT 
-                T.id_turno AS id_turno,
-                T.FechaTurno AS fecha,
-                T.HoraTurno AS hora,
-                T.estado AS estado,
-                E.nombreEspecialidad AS especialidad,
-                P.nombre_completo AS profesional
-            FROM Turno T
-            JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
-            JOIN Profesional P ON T.profesional_id = P.id_profesional
-            WHERE T.paciente_id = ?
-            ORDER BY T.FechaTurno DESC, T.HoraTurno DESC
-        `, [paciente_id]);
+        try {
+            const [turnos] = await pool.execute(`
+                SELECT 
+                    T.id_turno AS id_turno,
+                    T.FechaTurno AS fecha,
+                    T.HoraTurno AS hora,
+                    T.estado AS estado,
+                    E.nombreEspecialidad AS especialidad,
+                    P.nombre_completo AS profesional
+                FROM Turno T
+                JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
+                JOIN Profesional P ON T.profesional_id = P.id_profesional
+                WHERE T.paciente_id = ?
+                ORDER BY T.FechaTurno DESC, T.HoraTurno DESC
+            `, [paciente_id]);
 
-        return turnos;
-    } catch (error) {
-        console.error("❌ Error al obtener turnos del paciente:", error.message);
-        throw error;
-    }
-},
+            return turnos;
+        } catch (error) {
+            console.error("❌ Error al obtener turnos del paciente:", error.message);
+            throw error;
+        }
+    },
 
-    // ✅ Obtener horarios disponibles de un profesional
     obtenerHorariosDisponibles: async (profesional_id, especialidad_id, fecha) => {
         try {
-            const [horarios] = await db.execute(`
+            const [horarios] = await pool.execute(`
                 SELECT HoraInicio, HoraFin  
                 FROM HorarioDisponible 
                 WHERE profesional_id = ? AND especialidad_id = ?  
@@ -99,10 +96,9 @@ const Turno = {
         }
     },
 
-    // ✅ Obtener solo las horas ocupadas
     obtenerTurnosOcupados: async (profesional_id, especialidad_id, fecha) => {
         try {
-            const [ocupados] = await db.execute(`
+            const [ocupados] = await pool.execute(`
                 SELECT HoraTurno 
                 FROM Turno 
                 WHERE profesional_id = ? AND especialidad_id = ? AND FechaTurno = ?
@@ -116,19 +112,18 @@ const Turno = {
         }
     },
 
-    // ✅ Cancelar turno
     cancelarTurno: async (id_turno, paciente_id) => {
         try {
-            const [resultado] = await db.execute(`
+            const [resultado] = await pool.execute(`
                 UPDATE Turno
                 SET estado = 'Cancelado'
                 WHERE id_turno = ? AND paciente_id = ?
             `, [id_turno, paciente_id]);
-            await db.execute(`
-    INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
-    VALUES (?, ?, ?)
-`, [id_turno, paciente_id, 'Cancelado']);
 
+            await pool.execute(`
+                INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo)
+                VALUES (?, ?, ?)
+            `, [id_turno, paciente_id, 'Cancelado']);
 
             if (resultado.affectedRows === 0) {
                 throw new Error('No se encontró el turno o no pertenece al paciente');
@@ -141,25 +136,24 @@ const Turno = {
         }
     },
 
-    // ✅ Obtener el próximo turno confirmado o en espera
     obtenerProximosTurnos: async (paciente_id) => {
         try {
-            const [turnos] = await db.execute(`
+            const [turnos] = await pool.execute(`
                 SELECT 
-                T.id_turno AS id_turno,
-                T.FechaTurno AS fecha,
-                T.HoraTurno AS hora,
-                T.estado AS estado,
-                E.nombreEspecialidad AS especialidad,
-                P.nombre_completo AS profesional
-            FROM Turno T
-            JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
-            JOIN Profesionales P ON T.profesional_id = P.id_profesional
-            WHERE T.paciente_id = ? 
-              AND T.estado IN ('En espera', 'Confirmado')
-              AND T.FechaTurno >= CURDATE()
-            ORDER BY T.FechaTurno ASC, T.HoraTurno ASC
-            LIMIT 1
+                    T.id_turno AS id_turno,
+                    T.FechaTurno AS fecha,
+                    T.HoraTurno AS hora,
+                    T.estado AS estado,
+                    E.nombreEspecialidad AS especialidad,
+                    P.nombre_completo AS profesional
+                FROM Turno T
+                JOIN Especialidad E ON T.especialidad_id = E.id_especialidad
+                JOIN Profesionales P ON T.profesional_id = P.id_profesional
+                WHERE T.paciente_id = ? 
+                  AND T.estado IN ('En espera', 'Confirmado')
+                  AND T.FechaTurno >= CURDATE()
+                ORDER BY T.FechaTurno ASC, T.HoraTurno ASC
+                LIMIT 1
             `, [paciente_id]);
 
             return turnos[0] || null;
