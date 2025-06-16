@@ -60,3 +60,7 @@ input {
 p {
   margin-top: 15px;
 }
+
+body * {
+  user-select: none;
+}
