@@ -5,7 +5,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getUsuario: () => ipcRenderer.invoke('getUsuario'),
   abrirModulo: (modulo) => ipcRenderer.invoke('abrirModulo', modulo),
   // GESTIÓN TURNOS
-obtenerTurnos: () => ipcRenderer.invoke('obtenerTurnos'),
+obtenerMensajesContacto: () => ipcRenderer.invoke('obtenerMensajesContacto'),
+marcarContactoRespondido: (id) => ipcRenderer.invoke('marcarContactoRespondido', id),
+obtenerHorariosDisponibles: (profesionalId, especialidadId) => ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
+obtenerTurnos: (estado) => ipcRenderer.invoke('obtenerTurnos', estado),
 actualizarEstadoTurno: (id, estado) => ipcRenderer.invoke('actualizarEstadoTurno', id, estado),
 reprogramarTurno: (id, fecha, hora) => ipcRenderer.invoke('reprogramarTurno', id, fecha, hora),
 
@@ -15,10 +18,16 @@ reprogramarTurno: (id, fecha, hora) => ipcRenderer.invoke('reprogramarTurno', id
 
   // Agregado necesario
   agregarProfesional: (datos) => ipcRenderer.invoke('agregarProfesional', datos),
+  
+  obtenerHorariosPorDia: (profesionalId, especialidadId, diaSemana) =>
+  ipcRenderer.invoke('obtenerHorariosPorDia', profesionalId, especialidadId, diaSemana),
 
   // Modal (opcional si lo manejás por HTML directamente)
   abrirFormularioAgregarProfesional: () => ipcRenderer.invoke('abrirFormularioAgregarProfesional')
+  
+  
 });
+
 
 // Simulación temporal de rol
 const rolUsuario = 'secretaria';

@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <title>Módulo: Contacto</title>
+  <title>Módulo de Contacto</title>
   <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { color: #2c3e50; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    .respondido { background-color: #e0ffe0; }
+    .pendiente { background-color: #ffe0e0; }
+    button { padding: 4px 10px; }
   </style>
 </head>
 <body>
-  <h1>Módulo: Contacto</h1>
-  <p>Contenido inicial para el módulo de Contacto.</p>
+
+  <h1>Mensajes de Contacto</h1>
+
+  <table id="tablaContacto">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Email</th>
+        <th>Motivo</th>
+        <th>Mensaje</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script src="contacto.js"></script>
 </body>
 </html>

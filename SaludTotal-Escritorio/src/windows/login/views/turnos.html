@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <!-- Incluís SweetAlert2 desde CDN en tu HTML -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <title>Gestión de Turnos</title>
     <style>
         * { box-sizing: border-box; }
@@ -11,13 +13,24 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
             background-color: #f5f7fa;
-            color: #333;
+            color: #2c3e50;
         }
 
         h1 {
             font-size: 2rem;
             font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        select {
+            padding: 5px 10px;
+            font-size: 1rem;
             margin-bottom: 20px;
         }
 
@@ -31,7 +44,7 @@
         }
 
         thead tr {
-            background-color: #34495e;
+            background-color: #007bff;
             color: white;
             text-transform: uppercase;
             font-size: 0.85rem;
@@ -140,6 +153,16 @@
 <body>
     <h1>Gestión de Turnos</h1>
 
+    <div>
+        <label for="filtroEstado">Filtrar por estado:</label>
+        <select id="filtroEstado">
+            <option value="">Todos</option>
+            <option value="En espera">En espera</option>
+            <option value="Cancelado">Cancelado</option>
+            <option value="Reprogramado">Reprogramado</option>
+        </select>
+    </div>
+
     <table>
         <thead>
             <tr>
@@ -153,19 +176,7 @@
             </tr>
         </thead>
         <tbody id="tbodyTurnos">
-            <!-- Ejemplo de fila (puede ser generado dinámicamente) -->
-            <tr>
-                <td data-label="ID">1</td>
-                <td data-label="Paciente">Juan Pérez</td>
-                <td data-label="Profesional">Dr. García</td>
-                <td data-label="Fecha">2025-06-15</td>
-                <td data-label="Hora">14:30</td>
-                <td data-label="Estado" class="estado-activo">Activo</td>
-                <td data-label="Acciones">
-                    <button class="btn-editar">Editar</button>
-                    <button class="btn-eliminar">Eliminar</button>
-                </td>
-            </tr>
+            <!-- Las filas se generan dinámicamente -->
         </tbody>
     </table>
 
