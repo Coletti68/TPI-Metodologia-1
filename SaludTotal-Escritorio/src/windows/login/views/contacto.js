@@ -1,49 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
-  cargarMensajesContacto();
+  cargarContactos();
 });
 
-async function cargarMensajesContacto() {
-  const tbody = document.querySelector('#tablaContacto tbody');
+let contactoSeleccionado = null;
+
+async function cargarContactos() {
+  const contactos = await window.electronAPI.obtenerContactos();
+  const tbody = document.getElementById('tbodyContacto');
   tbody.innerHTML = '';
 
-  try {
-    const mensajes = await window.electronAPI.obtenerMensajesContacto();
-
-    mensajes.forEach(msg => {
-      const tr = document.createElement('tr');
-      tr.className = msg.respondido ? 'respondido' : 'pendiente';
-
-      tr.innerHTML = `
-        <td>${new Date(msg.fecha).toLocaleString()}</td>
-        <td>${msg.email}</td>
-        <td>${msg.motivo}</td>
-        <td>${msg.mensaje}</td>
-        <td>${msg.respondido ? 'Respondido' : 'Pendiente'}</td>
-        <td>
-          ${msg.respondido
-            ? '—'
-            : `<button onclick="marcarRespondido(${msg.id_contacto})">Marcar como respondido</button>`}
-        </td>
-      `;
-
-      tbody.appendChild(tr);
-    });
-
-  } catch (error) {
-    console.error('Error cargando mensajes:', error);
-    alert('Error cargando mensajes de contacto');
-  }
+  contactos.forEach(contacto => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${contacto.id_contacto}</td>
+      <td>${contacto.paciente_id || '-'}</td>
+      <td>${contacto.email}</td>
+      <td>${contacto.motivo}</td>
+      <td>${contacto.mensaje}</td>
+      <td>${new Date(contacto.fecha).toLocaleString()}</td>
+      <td>${contacto.respondido ? 'Sí' : 'No'}</td>
+      <td>
+        ${contacto.respondido ? '-' : `<button onclick="mostrarFormulario(${contacto.id_contacto}, '${contacto.email}')">Responder</button>`}
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
-async function marcarRespondido(id) {
-  const confirmar = confirm('¿Estás seguro de marcar este mensaje como respondido?');
-  if (!confirmar) return;
+function mostrarFormulario(id, email) {
+  contactoSeleccionado = { id, email };
+  document.getElementById('infoContacto').innerText = `Responder a: ${email}`;
+  document.getElementById('respuestaMensaje').value = '';
+  document.getElementById('formRespuesta').style.display = 'block';
+}
 
-  try {
-    await window.electronAPI.marcarContactoRespondido(id);
-    cargarMensajesContacto();
-  } catch (error) {
-    console.error('Error actualizando estado:', error);
-    alert('No se pudo marcar como respondido');
-  }
+function cancelar() {
+  contactoSeleccionado = null;
+  document.getElementById('formRespuesta').style.display = 'none';
+}
+
+async function enviarRespuesta() {
+  const respuesta = document.getElementById('respuestaMensaje').value.trim();
+  if (!respuesta) return alert("La respuesta no puede estar vacía.");
+
+  await window.electronAPI.responderContacto(contactoSeleccionado.id, respuesta);
+  alert("Respuesta enviada.");
+  cancelar();
+  cargarContactos();
 }

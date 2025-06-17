@@ -247,3 +247,13 @@ ipcMain.handle('marcarContactoRespondido', async (event, id_contacto) => {
  app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
  });
+
+const contactoController = require('./controllers/contactoController');
+
+ipcMain.handle('obtenerContactos', async () => {
+  return await contactoController.obtenerTodos();
+});
+
+ipcMain.handle('responderContacto', async (event, id, respuesta) => {
+  return await contactoController.responder(id, respuesta);
+});

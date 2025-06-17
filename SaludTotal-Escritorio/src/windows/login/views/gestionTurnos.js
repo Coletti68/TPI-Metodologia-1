@@ -63,7 +63,7 @@ async function reprogramarTurno(id) {
       title: 'Reprogramar turno',
       html:
         '<input id="swal-input1" class="swal2-input" placeholder="Fecha (YYYY-MM-DD)">' +
-        '<input id="swal-input2" class="swal2-input" placeholder="Hora (HH:MM:SS)">',
+        '<input id="swal-input2" class="swal2-input" placeholder="Hora (HH:MM)">',
       focusConfirm: false,
       preConfirm: () => {
         const fecha = document.getElementById('swal-input1').value;

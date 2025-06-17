@@ -5,12 +5,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getUsuario: () => ipcRenderer.invoke('getUsuario'),
   abrirModulo: (modulo) => ipcRenderer.invoke('abrirModulo', modulo),
   // GESTIÓN TURNOS
-obtenerMensajesContacto: () => ipcRenderer.invoke('obtenerMensajesContacto'),
-marcarContactoRespondido: (id) => ipcRenderer.invoke('marcarContactoRespondido', id),
-obtenerHorariosDisponibles: (profesionalId, especialidadId) => ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
-obtenerTurnos: (estado) => ipcRenderer.invoke('obtenerTurnos', estado),
-actualizarEstadoTurno: (id, estado) => ipcRenderer.invoke('actualizarEstadoTurno', id, estado),
-reprogramarTurno: (id, fecha, hora) => ipcRenderer.invoke('reprogramarTurno', id, fecha, hora),
+  obtenerMensajesContacto: () => ipcRenderer.invoke('obtenerMensajesContacto'),
+  marcarContactoRespondido: (id) => ipcRenderer.invoke('marcarContactoRespondido', id),
+  obtenerHorariosDisponibles: (profesionalId, especialidadId) => ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
+  obtenerTurnos: (estado) => ipcRenderer.invoke('obtenerTurnos', estado),
+  actualizarEstadoTurno: (id, estado) => ipcRenderer.invoke('actualizarEstadoTurno', id, estado),
+  reprogramarTurno: (id, fecha, hora) => ipcRenderer.invoke('reprogramarTurno', id, fecha, hora),
+  obtenerContactos: () => ipcRenderer.invoke('obtenerContactos'),
+  responderContacto: (id, respuesta) => ipcRenderer.invoke('responderContacto', id, respuesta),
 
   // Pacientes y profesionales
   obtenerPacientes: () => ipcRenderer.invoke('obtenerPacientes'),
