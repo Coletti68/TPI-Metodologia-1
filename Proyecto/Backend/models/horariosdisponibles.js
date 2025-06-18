@@ -1,10 +1,9 @@
-//models/horariodisponible.js
-const db = require('../db');
+const pool = require('../db').getPool();
 
 const HorarioDisponible = {
     obtenerHorariosDisponibles: async (profesional_id, especialidad_id, fecha) => {
         try {
-            const [horarios] = await db.execute(`
+            const [horarios] = await pool.execute(`
                 SELECT HoraInicio, HoraFin  
                 FROM HorarioDisponible 
                 WHERE profesional_id = ? AND especialidad_id = ?

@@ -25,3 +25,4 @@ const patientController = {
 };
 
 module.exports = patientController;
+

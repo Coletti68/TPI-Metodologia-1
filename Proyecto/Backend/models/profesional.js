@@ -1,9 +1,9 @@
-//models/profesional.js
-const db = require('../db');
+const pool = require('../db').getPool();
+
 const Profesional = {
     obtenerPorEspecialidad: async (especialidad_id) => {
         try {
-            const [profesionales] = await db.execute(`
+            const [profesionales] = await pool.execute(`
                 SELECT P.id_profesional, P.nombre_completo
                 FROM Profesional P
                 JOIN ProfesionalEspecialidad PE ON P.id_profesional = PE.profesional_id
@@ -17,7 +17,6 @@ const Profesional = {
         }
     }
 };
-
 
 module.exports = Profesional;
 
