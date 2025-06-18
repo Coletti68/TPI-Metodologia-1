@@ -1,16 +1,43 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta charset="UTF-8">
-  <title>Módulo: Informes</title>
-  <style>
-    body { font-family: Arial; padding: 20px; }
-    h1 { color: #2c3e50; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informe por Profesional</title>
+    <link rel="stylesheet" href="./informeturno.css">
 </head>
 <body>
-  <h1>Módulo: Informes</h1>
-  <p>Contenido inicial para el módulo de Informes.</p>
+    <h2>Informe de Turnos por Profesional</h2>
+
+    <div style="margin-bottom: 15px; text-align: center;">
+        <label for="fechaDesde">Desde:</label>
+        <input type="date" id="fechaDesde">
+
+        <label for="fechaHasta">Hasta:</label>
+        <input type="date" id="fechaHasta">
+
+        <label for="profesionalFiltro">Profesional:</label>
+        <select id="profesionalFiltro"></select>
+
+        <button id="btnGenerar">Generar Informe</button>
+    </div>
+
+    <p id="resumen">Total: 0 | Confirmados: 0 | Cancelados: 0 | En espera: 0</p>
+
+    <table>
+        <thead>
+         <tr>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Paciente</th>
+            <th>Profesional</th>
+            <th>Especialidad</th>
+            <th>Estado</th>
+         </tr>
+        </thead>
+        <tbody id="tbodyTurnos"></tbody>
+    </table>
+
+    <script src="informeturno.js"></script>
 </body>
 </html>

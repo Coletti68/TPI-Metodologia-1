@@ -15,7 +15,8 @@
     "cors": "^2.8.5",
     "electron": "^36.4.0",
     "express": "^5.1.0",
-    "mysql2": "^3.14.1"
+    "mysql2": "^3.14.1",
+    "path": "^0.12.7"
   },
   "repository": {
     "type": "git",
