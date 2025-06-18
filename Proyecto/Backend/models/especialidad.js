@@ -1,11 +1,9 @@
-const pool = require('../db').getPool();
+const db = require('../db');
 
 const Especialidad = {
     obtenerTodas: async () => {
         try {
-            const [especialidades] = await pool.execute(`
-                SELECT * FROM Especialidad ORDER BY nombreEspecialidad
-            `);
+            const [especialidades] = await db.execute(`SELECT * FROM Especialidad ORDER BY nombreEspecialidad`);
             return especialidades;
         } catch (error) {
             console.error('❌ Error al obtener especialidades:', error.message);

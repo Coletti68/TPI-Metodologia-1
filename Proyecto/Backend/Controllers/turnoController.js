@@ -108,17 +108,18 @@ const turnoController = {
     },
 
   // 👉 Cancelar turno
-cancelarTurno: async (req, res) => {
+   cancelarTurno: async (req, res) => {
     console.log('Llega petición para cancelar turno:', req.params.id_turno, req.body);
     const { id_turno } = req.params;
     const { paciente_id } = req.body;
 
     try {
+        // 1. Cancelar turno
         const resultado = await Turno.cancelarTurno(id_turno, paciente_id);
 
+        // 2. Registrar en historial si la cancelación fue exitosa
         if (resultado && resultado.affectedRows > 0) {
-            const pool = require('../db').getPool(); // ✅ corregido aquí
-            await pool.execute(`
+            await db.query(`
                 INSERT INTO HistorialTurno (turno_id, paciente_id, estado_nuevo, fecha)
                 VALUES (?, ?, ?, NOW())
             `, [id_turno, paciente_id, 'Cancelado']);

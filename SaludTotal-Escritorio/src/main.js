@@ -145,19 +145,48 @@ function configurarIPC() {
   // 🟢 Aquí en el futuro podrás ir agregando la lógica de TURNOS, igual que pacientes/profesionales.
   const { 
   obtenerTurnos,
+  obtenerHorariosDisponibles,
   actualizarEstadoTurno,
-  reprogramarTurno 
+  reprogramarTurno,
+  adminTurnoController
  } = require('./controllers/adminTurnoController');
 
  // Obtener turnos
- ipcMain.handle('obtenerTurnos', async () => {
+ipcMain.handle('obtenerTurnos', async (event, estado) => {
+  console.log('IPC obtenerTurnos llamado con estado:', estado);
+  const datos = await obtenerTurnos(estado);
+  console.log('Datos obtenidos:', datos.length);
+  return datos;
+});
+
+ ipcMain.handle('obtenerHorariosPorDia', async (event, profesionalId, especialidadId, diaSemana) => {
+  const [rows] = await pool.query(
+    `SELECT HoraInicio, HoraFin FROM HorarioDisponible 
+     WHERE profesional_id = ? AND especialidad_id = ? AND DiaSemana = ?`,
+    [profesionalId, especialidadId, diaSemana]
+  );
+  return rows;
+});
+
+ ipcMain.handle('obtenerTurnoPorId', async (event, id) => {
   try {
-    return await obtenerTurnos();
+    const [rows] = await pool.execute(`
+      SELECT t.*, p.id_profesional AS profesional_id, p.id_especialidad AS especialidad_id
+      FROM Turnos t
+      JOIN Profesionales p ON t.id_profesional = p.id_profesional
+      WHERE t.id_turno = ?
+    `, [id]);
+
+    if (rows.length === 0) {
+      throw new Error(`Turno con ID ${id} no encontrado.`);
+    }
+
+    return rows[0];
   } catch (error) {
-    console.error('❌ Error al obtener turnos:', error.message);
+    console.error('Error al obtener turno por ID:', error);
     throw error;
   }
- });
+});
 
  // Cambiar estado de turno
  ipcMain.handle('actualizarEstadoTurno', async (event, idTurno, nuevoEstado) => {
@@ -168,6 +197,16 @@ function configurarIPC() {
     throw error;
   }
  });
+
+
+ipcMain.handle('obtenerHorariosDisponibles', async (event, profesionalId, especialidadId) => {
+  try {
+    return await obtenerHorariosDisponibles(profesionalId, especialidadId);
+  } catch (error) {
+    console.error('Error en obtenerHorariosDisponibles:', error);
+    throw error;
+  }
+});
 
  // Reprogramar turno
  ipcMain.handle('reprogramarTurno', async (event, idTurno, nuevaFecha, nuevaHora) => {
@@ -180,7 +219,41 @@ function configurarIPC() {
  });
  }
 
+ const { obtenerMensajesContacto, marcarMensajeRespondido } = require('./controllers/contactoController');
+
+// Obtener todos los mensajes de contacto
+ipcMain.handle('obtenerMensajesContacto', async () => {
+  try {
+    const mensajes = await obtenerMensajesContacto();
+    return mensajes;
+  } catch (error) {
+    console.error('Error al obtener mensajes:', error);
+    throw error;
+  }
+});
+
+// Marcar un mensaje como respondido
+ipcMain.handle('marcarContactoRespondido', async (event, id_contacto) => {
+  try {
+    await marcarMensajeRespondido(id_contacto);
+    return { ok: true };
+  } catch (error) {
+    console.error('Error al marcar como respondido:', error);
+    throw error;
+  }
+});
+
  // Cierre completo
  app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
  });
+
+const contactoController = require('./controllers/contactoController');
+
+ipcMain.handle('obtenerContactos', async () => {
+  return await contactoController.obtenerTodos();
+});
+
+ipcMain.handle('responderContacto', async (event, id, respuesta) => {
+  return await contactoController.responder(id, respuesta);
+});

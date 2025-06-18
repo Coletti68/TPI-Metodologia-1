@@ -1,12 +1,18 @@
 document.addEventListener('DOMContentLoaded', () => {
-    cargarTurnos();
+    selectFiltro.addEventListener('change', () => {
+        cargarTurnos(selectFiltro.value); // recarga al cambiar filtro
+    });
+
+    cargarTurnos(); // carga inicial sin filtro
 });
 
-async function cargarTurnos() {
-    try {
-        const turnos = await window.electronAPI.obtenerTurnos();
+const selectFiltro = document.getElementById('filtroEstado');
+const tbody = document.getElementById('tbodyTurnos');
 
-        const tbody = document.getElementById('tbodyTurnos');
+async function cargarTurnos(estado = "") {
+    try {
+        const turnos = await window.electronAPI.obtenerTurnos(estado || null);
+
         tbody.innerHTML = '';
 
         turnos.forEach(turno => {
@@ -34,21 +40,71 @@ async function cargarTurnos() {
     }
 }
 
+
 async function confirmarTurno(id) {
+    const confirmar = confirm('¿Estás seguro que deseas confirmar este turno?');
+    if (!confirmar) return;
+
     await window.electronAPI.actualizarEstadoTurno(id, 'Confirmado');
     cargarTurnos();
 }
 
 async function cancelarTurno(id) {
+    const confirmar = confirm('¿Estás seguro que deseas cancelar este turno?');
+    if (!confirmar) return;
+
     await window.electronAPI.actualizarEstadoTurno(id, 'Cancelado');
     cargarTurnos();
 }
 
 async function reprogramarTurno(id) {
-    const nuevaFecha = prompt('Nueva fecha (YYYY-MM-DD):');
-    const nuevaHora = prompt('Nueva hora (HH:MM:SS):');
-    if (nuevaFecha && nuevaHora) {
-        await window.electronAPI.reprogramarTurno(id, nuevaFecha, nuevaHora);
+  try {
+    const { value: formValues } = await Swal.fire({
+      title: 'Reprogramar turno',
+      html:
+        '<input id="swal-input1" class="swal2-input" placeholder="Fecha (YYYY-MM-DD)">' +
+        '<input id="swal-input2" class="swal2-input" placeholder="Hora (HH:MM)">',
+      focusConfirm: false,
+      preConfirm: () => {
+        const fecha = document.getElementById('swal-input1').value;
+        const hora = document.getElementById('swal-input2').value;
+        if (!fecha || !hora) {
+          Swal.showValidationMessage('Ambos campos son obligatorios');
+          return;
+        }
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(fecha)) {
+          Swal.showValidationMessage('Formato de fecha inválido');
+          return;
+        }
+        if (!/^\d{2}:\d{2}:\d{2}$/.test(hora)) {
+          Swal.showValidationMessage('Formato de hora inválido');
+          return;
+        }
+        return { fecha, hora };
+      }
+    });
+
+    if (!formValues) return; // Si canceló
+
+    const confirmacion = await Swal.fire({
+      title: '¿Confirmar reprogramación?',
+      text: `Fecha: ${formValues.fecha} Hora: ${formValues.hora}`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, reprogramar',
+      cancelButtonText: 'Cancelar'
+    });
+
+    if (confirmacion.isConfirmed) {
+      await window.electronAPI.reprogramarTurno(id, formValues.fecha, formValues.hora);
         cargarTurnos();
+      Swal.fire('Reprogramado', 'El turno fue reprogramado correctamente', 'success');
+    }
+
+  } catch (error) {
+    console.error('Error reprogramando turno:', error);
+    Swal.fire('Error', 'Ocurrió un error al reprogramar el turno: ' + (error.message || error), 'error');
     }
 }
+
+
