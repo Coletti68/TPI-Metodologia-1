@@ -94,7 +94,6 @@ const turnoController = {
     }
 },
 
-
     // 👉 Historial de turnos
     obtenerHistorialTurnos: async (req, res) => {
         const { paciente_id } = req.params;

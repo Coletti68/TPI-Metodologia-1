@@ -124,3 +124,7 @@ form.form-turno {
 .boton-principal:hover {
   background-color: #1565c0;
 }
+
+body * {
+  user-select: none;
+}
