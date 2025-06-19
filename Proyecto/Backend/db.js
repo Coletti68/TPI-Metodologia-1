@@ -6,8 +6,8 @@ async function conectar() {
   pool = await mysql.createPool({
     host: 'localhost',
     user: 'root',
-    password: 'Facundo1',
     database: 'SaludTotalBDD',
+    password: 'Facundo1',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,

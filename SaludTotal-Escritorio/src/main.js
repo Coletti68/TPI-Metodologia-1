@@ -166,10 +166,15 @@ ipcMain.handle('obtenerTurnos', async (event, estado) => {
     [profesionalId, especialidadId, diaSemana]
   );
   return rows;
-});
+   });
 
- ipcMain.handle('obtenerTurnoPorId', async (event, id) => {
-  try {
+   const { obtenerTurnosPorProfesional } = require('./controllers/informeTurnoController');
+
+   ipcMain.handle('obtenerTurnosPorProfesional', async (event, desde, hasta, profesionalId) => {
+    return await obtenerTurnosPorProfesional(desde, hasta, profesionalId);
+   });
+   ipcMain.handle('obtenerTurnoPorId', async (event, id) => {
+   try {
     const [rows] = await pool.execute(`
       SELECT t.*, p.id_profesional AS profesional_id, p.id_especialidad AS especialidad_id
       FROM Turnos t
@@ -257,3 +262,4 @@ ipcMain.handle('obtenerContactos', async () => {
 ipcMain.handle('responderContacto', async (event, id, respuesta) => {
   return await contactoController.responder(id, respuesta);
 });
+

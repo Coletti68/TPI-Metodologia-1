@@ -4,7 +4,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   login: (credentials) => ipcRenderer.invoke('login', credentials),
   getUsuario: () => ipcRenderer.invoke('getUsuario'),
   abrirModulo: (modulo) => ipcRenderer.invoke('abrirModulo', modulo),
-  // GESTIÓN TURNOS
+ 
+  
   obtenerMensajesContacto: () => ipcRenderer.invoke('obtenerMensajesContacto'),
   marcarContactoRespondido: (id) => ipcRenderer.invoke('marcarContactoRespondido', id),
   obtenerHorariosDisponibles: (profesionalId, especialidadId) => ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
@@ -17,6 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   // Pacientes y profesionales
   obtenerPacientes: () => ipcRenderer.invoke('obtenerPacientes'),
   obtenerProfesionales: () => ipcRenderer.invoke('obtenerProfesionales'),
+  obtenerTurnosPorProfesional: (desde, hasta, profesionalId) => ipcRenderer.invoke('obtenerTurnosPorProfesional', desde, hasta, profesionalId),
 
   // Agregado necesario
   agregarProfesional: (datos) => ipcRenderer.invoke('agregarProfesional', datos),
