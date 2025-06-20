@@ -2,25 +2,37 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
-// Importamos la conexión a la BD y controladores
+// DB y controladores
 const { conectar, getPool } = require('./database/db');
 const { login } = require('./controllers/authController');
 const { obtenerPacientes } = require('./controllers/pacientecontroller');
-const { obtenerProfesionales } = require('./controllers/profesionalcontroller');
+const { 
+  obtenerProfesionales, 
+  obtenerEspecialidades, 
+  obtenerRoles 
+} = require('./controllers/profesionalcontroller');
+const { 
+  obtenerTurnos, 
+  obtenerHorariosDisponibles, 
+  actualizarEstadoTurno, 
+  reprogramarTurno 
+} = require('./controllers/adminTurnoController');
+const { obtenerTurnosPorProfesional } = require('./controllers/informeTurnoController');
+const contactoController = require('./controllers/contactoController');
+
 const bcryptjs = require('bcryptjs');
 
-// Estado global de la app
+// Estado global
 let usuarioActual = null;
 const ventanas = {};
 
-// Permisos por rol
 const permisosPorRol = {
   admin: ['pacientes', 'profesionales', 'turnos', 'reportes', 'configuracion', 'informes', 'horarios', 'contacto'],
   secretaria: ['pacientes', 'turnos', 'contacto'],
   'secretaria/o': ['pacientes', 'turnos', 'contacto']
 };
 
-// Crea la ventana principal de login
+// Crear ventana principal
 function createWindow() {
   const win = new BrowserWindow({
     width: 400,
@@ -32,41 +44,39 @@ function createWindow() {
   win.loadFile('windows/login/login.html');
 }
 
-// Iniciamos la app
+// Iniciar app
 app.whenReady().then(async () => {
   try {
     await conectar();
     console.log('✅ Conectado a la base de datos.');
     createWindow();
-    configurarIPC();  // 👈 Manejamos todos los eventos IPC desde acá
-
+    configurarIPC();
   } catch (error) {
     console.error('❌ Error general en app:', error.message);
   }
 });
 
-// ==============================
-// CONFIGURAMOS LOS IPC CENTRADOS
-// ==============================
+// ==============
+// IPC PRINCIPALES
+// ==============
 function configurarIPC() {
 
-  // Login
-  ipcMain.handle('login', async (event, credentials) => {
+  // ====================
+  // AUTENTICACIÓN Y MENÚ
+  // ====================
+  ipcMain.handle('login', async (_, credentials) => {
     const user = await login(credentials.email, credentials.password);
     if (user) {
       usuarioActual = user;
       console.log('✅ Usuario logueado:', usuarioActual);
       return { success: true, user };
-    } else {
-      return { success: false, message: 'Credenciales inválidas o rol no autorizado.' };
     }
+    return { success: false, message: 'Credenciales inválidas o rol no autorizado.' };
   });
 
-  // Obtener usuario actual
   ipcMain.handle('getUsuario', () => usuarioActual);
 
-  // Abrir módulos
-  ipcMain.handle('abrirModulo', (event, modulo) => {
+  ipcMain.handle('abrirModulo', (_, modulo) => {
     if (!usuarioActual) return;
 
     const rol = usuarioActual.nombreRol;
@@ -83,10 +93,7 @@ function configurarIPC() {
       return;
     }
 
-    if (ventanas[modulo]) {
-      ventanas[modulo].focus();
-      return;
-    }
+    if (ventanas[modulo]) return ventanas[modulo].focus();
 
     ventanas[modulo] = new BrowserWindow({
       width: 800,
@@ -98,10 +105,12 @@ function configurarIPC() {
     });
 
     ventanas[modulo].loadFile(ruta);
-    ventanas[modulo].on('closed', () => { ventanas[modulo] = null });
+    ventanas[modulo].on('closed', () => ventanas[modulo] = null);
   });
 
-  // Pacientes
+  // ============
+  // PACIENTES
+  // ============
   ipcMain.handle('obtenerPacientes', async () => {
     try {
       return await obtenerPacientes();
@@ -111,7 +120,9 @@ function configurarIPC() {
     }
   });
 
-  // Profesionales
+  // =====================
+  // PROFESIONALES Y ROLES
+  // =====================
   ipcMain.handle('obtenerProfesionales', async () => {
     try {
       return await obtenerProfesionales();
@@ -121,145 +132,165 @@ function configurarIPC() {
     }
   });
 
-  // Agregar profesional (ejemplo de guardado directo)
-  ipcMain.handle('agregarProfesional', async (event, profesional) => {
+  ipcMain.handle('agregarProfesional', async (_, profesional) => {
+    const pool = getPool();
+    const conn = await pool.getConnection();
     try {
-      const { dni, nombre_completo, sexo, email, especialidades, rol } = profesional;
-      const estado = 1;
+      await conn.beginTransaction();
 
-      const query = `
-        INSERT INTO Profesional (dni, nombre_completo, sexo, email, especialidades, rol, estado)
+      const { dni, nombre_completo, sexo, email, password, especialidad_id, rol_id, horarios } = profesional;
+
+      const [result] = await conn.execute(`
+        INSERT INTO Profesional (dni, nombre_completo, sexo, email, password, especialidad_id, rol_id)
         VALUES (?, ?, ?, ?, ?, ?, ?)
-      `;
+      `, [dni, nombre_completo, sexo, email, password, especialidad_id, rol_id]);
 
-      const pool = getPool();
-      await pool.execute(query, [dni, nombre_completo, sexo, email, especialidades, rol, estado]);
+      const profesionalId = result.insertId;
 
+      await conn.execute(`
+        INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id)
+        VALUES (?, ?)
+      `, [profesionalId, especialidad_id]);
+
+      for (const h of horarios) {
+        await conn.execute(`
+          INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin)
+          VALUES (?, ?, ?, ?, ?)
+        `, [profesionalId, especialidad_id, h.dia, h.inicio, h.fin]);
+      }
+
+      await conn.commit();
       return { success: true };
     } catch (err) {
-      console.error("❌ Error en agregarProfesional (IPC):", err);
+      await conn.rollback();
+      console.error("❌ Error al agregar profesional con horarios:", err.message);
+      throw err;
+    } finally {
+      conn.release();
+    }
+  });
+
+  ipcMain.handle('obtenerEspecialidades', async () => {
+    try {
+      return await obtenerEspecialidades();
+    } catch (err) {
+      console.error('❌ Error al obtener especialidades:', err.message);
       throw err;
     }
   });
 
-  // 🟢 Aquí en el futuro podrás ir agregando la lógica de TURNOS, igual que pacientes/profesionales.
-  const { 
-  obtenerTurnos,
-  obtenerHorariosDisponibles,
-  actualizarEstadoTurno,
-  reprogramarTurno,
-  adminTurnoController
- } = require('./controllers/adminTurnoController');
-
- // Obtener turnos
-ipcMain.handle('obtenerTurnos', async (event, estado) => {
-  console.log('IPC obtenerTurnos llamado con estado:', estado);
-  const datos = await obtenerTurnos(estado);
-  console.log('Datos obtenidos:', datos.length);
-  return datos;
-});
-
- ipcMain.handle('obtenerHorariosPorDia', async (event, profesionalId, especialidadId, diaSemana) => {
-  const [rows] = await pool.query(
-    `SELECT HoraInicio, HoraFin FROM HorarioDisponible 
-     WHERE profesional_id = ? AND especialidad_id = ? AND DiaSemana = ?`,
-    [profesionalId, especialidadId, diaSemana]
-  );
-  return rows;
-   });
-
-   const { obtenerTurnosPorProfesional } = require('./controllers/informeTurnoController');
-
-   ipcMain.handle('obtenerTurnosPorProfesional', async (event, desde, hasta, profesionalId) => {
-    return await obtenerTurnosPorProfesional(desde, hasta, profesionalId);
-   });
-   ipcMain.handle('obtenerTurnoPorId', async (event, id) => {
-   try {
-    const [rows] = await pool.execute(`
-      SELECT t.*, p.id_profesional AS profesional_id, p.id_especialidad AS especialidad_id
-      FROM Turnos t
-      JOIN Profesionales p ON t.id_profesional = p.id_profesional
-      WHERE t.id_turno = ?
-    `, [id]);
-
-    if (rows.length === 0) {
-      throw new Error(`Turno con ID ${id} no encontrado.`);
+  ipcMain.handle('obtenerRoles', async () => {
+    try {
+      return await obtenerRoles();
+    } catch (err) {
+      console.error('❌ Error al obtener roles:', err.message);
+      throw err;
     }
+  });
 
-    return rows[0];
-  } catch (error) {
-    console.error('Error al obtener turno por ID:', error);
-    throw error;
-  }
-});
+  // =========
+  // TURNOS
+  // =========
+  ipcMain.handle('obtenerTurnos', async (_, estado) => {
+    console.log('IPC obtenerTurnos llamado con estado:', estado);
+    const datos = await obtenerTurnos(estado);
+    console.log('Datos obtenidos:', datos.length);
+    return datos;
+  });
 
- // Cambiar estado de turno
- ipcMain.handle('actualizarEstadoTurno', async (event, idTurno, nuevoEstado) => {
-  try {
-    return await actualizarEstadoTurno(idTurno, nuevoEstado);
-  } catch (error) {
-    console.error('❌ Error al actualizar estado de turno:', error.message);
-    throw error;
-  }
- });
+  ipcMain.handle('obtenerHorariosPorDia', async (_, profesionalId, especialidadId, diaSemana) => {
+    const pool = getPool();
+    const [rows] = await pool.query(`
+      SELECT HoraInicio, HoraFin FROM HorarioDisponible 
+      WHERE profesional_id = ? AND especialidad_id = ? AND DiaSemana = ?
+    `, [profesionalId, especialidadId, diaSemana]);
+    return rows;
+  });
 
+  ipcMain.handle('obtenerTurnosPorProfesional', async (_, desde, hasta, profesionalId) => {
+    return await obtenerTurnosPorProfesional(desde, hasta, profesionalId);
+  });
 
-ipcMain.handle('obtenerHorariosDisponibles', async (event, profesionalId, especialidadId) => {
-  try {
-    return await obtenerHorariosDisponibles(profesionalId, especialidadId);
-  } catch (error) {
-    console.error('Error en obtenerHorariosDisponibles:', error);
-    throw error;
-  }
-});
+  ipcMain.handle('obtenerTurnoPorId', async (_, id) => {
+    const pool = getPool();
+    try {
+      const [rows] = await pool.execute(`
+        SELECT t.*, p.id_profesional AS profesional_id, p.id_especialidad AS especialidad_id
+        FROM Turnos t
+        JOIN Profesionales p ON t.id_profesional = p.id_profesional
+        WHERE t.id_turno = ?
+      `, [id]);
 
- // Reprogramar turno
- ipcMain.handle('reprogramarTurno', async (event, idTurno, nuevaFecha, nuevaHora) => {
-   try {
-     return await reprogramarTurno(idTurno, nuevaFecha, nuevaHora);
-   } catch (error) {
-     console.error('❌ Error al reprogramar turno:', error.message);
-     throw error;
-   }
- });
- }
+      if (rows.length === 0) {
+        throw new Error(`Turno con ID ${id} no encontrado.`);
+      }
 
- const { obtenerMensajesContacto, marcarMensajeRespondido } = require('./controllers/contactoController');
+      return rows[0];
+    } catch (error) {
+      console.error('Error al obtener turno por ID:', error);
+      throw error;
+    }
+  });
 
-// Obtener todos los mensajes de contacto
-ipcMain.handle('obtenerMensajesContacto', async () => {
-  try {
-    const mensajes = await obtenerMensajesContacto();
-    return mensajes;
-  } catch (error) {
-    console.error('Error al obtener mensajes:', error);
-    throw error;
-  }
-});
+  ipcMain.handle('actualizarEstadoTurno', async (_, idTurno, nuevoEstado) => {
+    try {
+      return await actualizarEstadoTurno(idTurno, nuevoEstado);
+    } catch (error) {
+      console.error('❌ Error al actualizar estado de turno:', error.message);
+      throw error;
+    }
+  });
 
-// Marcar un mensaje como respondido
-ipcMain.handle('marcarContactoRespondido', async (event, id_contacto) => {
-  try {
-    await marcarMensajeRespondido(id_contacto);
-    return { ok: true };
-  } catch (error) {
-    console.error('Error al marcar como respondido:', error);
-    throw error;
-  }
-});
+  ipcMain.handle('obtenerHorariosDisponibles', async (_, profesionalId, especialidadId) => {
+    try {
+      return await obtenerHorariosDisponibles(profesionalId, especialidadId);
+    } catch (error) {
+      console.error('Error en obtenerHorariosDisponibles:', error);
+      throw error;
+    }
+  });
 
- // Cierre completo
- app.on('window-all-closed', () => {
+  ipcMain.handle('reprogramarTurno', async (_, idTurno, nuevaFecha, nuevaHora) => {
+    try {
+      return await reprogramarTurno(idTurno, nuevaFecha, nuevaHora);
+    } catch (error) {
+      console.error('❌ Error al reprogramar turno:', error.message);
+      throw error;
+    }
+  });
+
+  // ==========================
+  // CONTACTO (Mensajes y Respuestas)
+  // ==========================
+  ipcMain.handle('obtenerMensajesContacto', async () => {
+    try {
+      return await contactoController.obtenerMensajesContacto();
+    } catch (error) {
+      console.error('Error al obtener mensajes:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('marcarContactoRespondido', async (_, id_contacto) => {
+    try {
+      await contactoController.marcarMensajeRespondido(id_contacto);
+      return { ok: true };
+    } catch (error) {
+      console.error('Error al marcar como respondido:', error);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('obtenerContactos', async () => {
+    return await contactoController.obtenerTodos();
+  });
+
+  ipcMain.handle('responderContacto', async (_, id, respuesta) => {
+    return await contactoController.responder(id, respuesta);
+  });
+}
+
+// Cierre de app
+app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
- });
-
-const contactoController = require('./controllers/contactoController');
-
-ipcMain.handle('obtenerContactos', async () => {
-  return await contactoController.obtenerTodos();
 });
-
-ipcMain.handle('responderContacto', async (event, id, respuesta) => {
-  return await contactoController.responder(id, respuesta);
-});
-

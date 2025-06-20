@@ -1,5 +1,7 @@
 window.addEventListener('DOMContentLoaded', () => {
   cargarProfesionales();
+  cargarEspecialidades();
+  cargarRoles();
 });
 
 // Función para cargar profesionales en la tabla
@@ -65,6 +67,26 @@ function cerrarModal() {
   document.getElementById('formNuevoProfesional').reset();
 }
 
+function agregarHorario() {
+  const contenedor = document.getElementById('contenedorHorarios');
+  const index = contenedor.querySelectorAll('.horario-item').length;
+
+  const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+
+  const div = document.createElement('div');
+  div.classList.add('horario-item');
+  div.innerHTML = `
+    <select name="diaSemana" required>
+      <option value="">Día</option>
+      ${dias.map(d => `<option value="${d}">${d}</option>`).join('')}
+    </select>
+    <input type="time" name="horaInicio" required />
+    <input type="time" name="horaFin" required />
+    <button type="button" onclick="this.parentElement.remove()">🗑️</button>
+  `;
+  contenedor.appendChild(div);
+}
+
 // Guardar nuevo profesional
 document.getElementById('formNuevoProfesional').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -74,29 +96,83 @@ document.getElementById('formNuevoProfesional').addEventListener('submit', async
     nombre_completo: document.getElementById('nombre_completo').value.trim(),
     sexo: document.getElementById('sexo').value,
     email: document.getElementById('email').value.trim(),
-    especialidades: document.getElementById('especialidades').value.trim(),
-    rol: document.getElementById('rol').value.trim()
+    password: document.getElementById('password').value.trim(),
+    especialidad_id: parseInt(document.getElementById('especialidad').value),
+    rol_id: parseInt(document.getElementById('rol').value)
   };
 
-  // Validación mínima en JS
-  if (!nuevoProfesional.dni || !nuevoProfesional.nombre_completo || !nuevoProfesional.sexo || !nuevoProfesional.email) {
+  // Validaciones
+  if (!nuevoProfesional.dni || !nuevoProfesional.nombre_completo || !nuevoProfesional.sexo || !nuevoProfesional.email || !nuevoProfesional.password) {
     alert("Por favor complete todos los campos obligatorios.");
+    return;
+  }
+
+  if (isNaN(nuevoProfesional.especialidad_id) || isNaN(nuevoProfesional.rol_id)) {
+    alert("Seleccione una especialidad y un rol válidos.");
     return;
   }
 
   try {
     await window.electronAPI.agregarProfesional(nuevoProfesional);
     cerrarModal();
-    await recargarTablaProfesionales(); // Evita reload completo
+    await recargarTablaProfesionales();
   } catch (error) {
     console.error("❌ Error al guardar profesional:", error);
     alert("Ocurrió un error al guardar el profesional.");
   }
+
+  // Capturar horarios
+const horarios = [];
+document.querySelectorAll('.horario-item').forEach(item => {
+  const dia = item.querySelector('select[name="diaSemana"]').value;
+  const inicio = item.querySelector('input[name="horaInicio"]').value;
+  const fin = item.querySelector('input[name="horaFin"]').value;
+
+  if (dia && inicio && fin) {
+    horarios.push({ dia, inicio, fin });
+  }
 });
 
-// Recarga la tabla (destruye DataTable y vuelve a crearla)
+nuevoProfesional.horarios = horarios;
+
+});
+
+// Recarga la tabla
 async function recargarTablaProfesionales() {
   const tabla = $('#tablaProfesionales').DataTable();
   tabla.destroy();
   await cargarProfesionales();
+}
+
+// Cargar especialidades en el <select>
+async function cargarEspecialidades() {
+  try {
+    const especialidades = await window.electronAPI.obtenerEspecialidades();
+    const select = document.getElementById('especialidad');
+    select.innerHTML = `<option value="">Seleccione una especialidad</option>`;
+    especialidades.forEach(esp => {
+      const option = document.createElement('option');
+      option.value = esp.id_especialidad;
+      option.textContent = esp.nombreEspecialidad;
+      select.appendChild(option);
+    });
+  } catch (error) {
+    console.error("❌ Error al cargar especialidades:", error);
+  }
+}
+
+async function cargarRoles() {
+  try {
+    const roles = await window.electronAPI.obtenerRoles();
+    const select = document.getElementById('rol');
+    select.innerHTML = '<option value="">Seleccione un rol</option>';
+    roles.forEach(rol => {
+      const option = document.createElement('option');
+      option.value = rol.id_rol;
+      option.textContent = rol.nombreRol;
+      select.appendChild(option);
+    });
+  } catch (err) {
+    console.error('❌ Error al cargar roles:', err);
+  }
 }

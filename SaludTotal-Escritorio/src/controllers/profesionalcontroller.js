@@ -23,4 +23,20 @@ async function obtenerProfesionales() {
   }
 }
 
-module.exports = { obtenerProfesionales };
+async function obtenerEspecialidades() {
+  const pool = getPool();
+  const [rows] = await pool.query('SELECT id_especialidad, nombreEspecialidad FROM Especialidad');
+  return rows;
+}
+
+async function obtenerRoles() {
+  const pool = getPool();
+  const [rows] = await pool.query('SELECT id_rol, nombreRol FROM Rol');
+  return rows;
+}
+
+module.exports = {
+  obtenerProfesionales,
+  obtenerEspecialidades,
+  obtenerRoles
+};

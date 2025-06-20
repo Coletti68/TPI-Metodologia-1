@@ -50,6 +50,7 @@
     <div style="background-color: white; padding: 20px; border-radius: 8px; width: 400px; max-width: 90%;">
       <h2>Nuevo Profesional</h2>
       <form id="formNuevoProfesional">
+
         <label>DNI:</label>
         <input type="text" name="dni" id="dni" required pattern="\d{7,8}" title="Ingrese un DNI válido de 7 u 8 dígitos"><br><br>
 
@@ -59,18 +60,23 @@
         <label>Sexo:</label>
         <select name="sexo" id="sexo" required>
           <option value="">Seleccione</option>
-          <option value="Femenino">Femenino</option>
-          <option value="Masculino">Masculino</option>
-          <option value="Otro">Otro</option>
+          <option value="M">Masculino</option>
+          <option value="F">Femenino</option>
         </select><br><br>
 
         <label>Email:</label>
         <input type="email" name="email" id="email" required><br><br>
 
-        <label>Especialidades:</label>
-        <input type="text" name="especialidades" id="especialidades" required><br><br>
+        <label>Contraseña:</label>
+        <input type="password" name="password" id="password" required><br><br>
 
-        <label>Rol:</label>
+        <label>Especialidad:</label>
+        <select name="especialidad" id="especialidad" required>
+          <option value="">Seleccione una especialidad</option>
+          <!-- Se llena dinámicamente desde JS -->
+        </select><br><br>
+
+         <label>Rol:</label>
         <input type="text" name="rol" id="rol" value="profesional" readonly><br><br>
 
         <div style="text-align: right;">
@@ -95,6 +101,7 @@
     // Cerrar el modal
     document.getElementById('btnCerrarModal').addEventListener('click', () => {
       document.getElementById('modalAgregar').style.display = 'none';
+      document.getElementById('formNuevoProfesional').reset();
     });
   </script>
 </body>

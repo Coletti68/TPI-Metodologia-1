@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Agregado necesario
   agregarProfesional: (datos) => ipcRenderer.invoke('agregarProfesional', datos),
+  obtenerEspecialidades: () => ipcRenderer.invoke('obtenerEspecialidades'),
+  obtenerRoles: () => ipcRenderer.invoke('obtenerRoles'),
   
   obtenerHorariosPorDia: (profesionalId, especialidadId, diaSemana) =>
   ipcRenderer.invoke('obtenerHorariosPorDia', profesionalId, especialidadId, diaSemana),
