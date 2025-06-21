@@ -1,3 +1,4 @@
+//login.js
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -5,7 +6,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch('http://localhost:3000/api/pacientes/login', {
+    const response = await fetch('http://192.168.1.38:3000/api/pacientes/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dni, password })
@@ -14,12 +15,11 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     const data = await response.json();
 
     if (response.ok) {
-      // Guardamos el id y nombre para usar después si querés
       localStorage.setItem('pacienteId', data.id_paciente);
       localStorage.setItem('pacienteNombre', data.nombre_completo);
 
       alert('✅ Inicio de sesión exitoso.');
-      window.location.href = "Home_Login.html"; // Página destino después del login
+      window.location.href = "Home_Login.html";
     } else {
       alert('❌ ' + (data.error || 'Credenciales incorrectas.'));
     }

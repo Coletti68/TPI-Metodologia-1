@@ -1,3 +1,4 @@
+//server.js
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
@@ -31,9 +32,9 @@ async function startServer() {
     app.use('/api/contacto', contactoRoutes);
     app.use('/api/historial', historialRoutes);
 
-    app.listen(PORT, () => {
-      console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-    });
+    app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
+});
   } catch (err) {
     console.error('❌ Error al conectar a la base de datos:', err.message);
     process.exit(1);

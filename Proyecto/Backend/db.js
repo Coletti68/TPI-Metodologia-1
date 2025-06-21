@@ -7,7 +7,7 @@ async function conectar() {
     host: 'localhost',
     user: 'root',
     database: 'SaludTotalBDD',
-    password: 'Facundo1',
+    password: 'marcosroa03',
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
