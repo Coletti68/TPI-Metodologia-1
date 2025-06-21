@@ -27,14 +27,14 @@ async function obtenerTurnos(estado = null) {
 
 // Cambiar estado de turno
 async function actualizarEstadoTurno(idTurno, nuevoEstado) {
-  const pool = getPool();
+  const pool = await getPool();
   await pool.execute('UPDATE Turno SET estado = ? WHERE id_turno = ?', [nuevoEstado, idTurno]);
   return { success: true };
 }
 
 // Reprogramar turno y actualizar estado
 async function reprogramarTurno(idTurno, nuevaFecha, nuevaHora) {
-  const pool = getPool();
+  const pool = await getPool();
   await pool.execute(
     'UPDATE Turno SET FechaTurno = ?, HoraTurno = ?, estado = ? WHERE id_turno = ?',
     [nuevaFecha, nuevaHora, 'Reprogramado', idTurno]
@@ -43,7 +43,7 @@ async function reprogramarTurno(idTurno, nuevaFecha, nuevaHora) {
 }
 
 async function obtenerHorariosDisponibles(profesionalId, especialidadId) {
-  const pool = getPool();
+  const pool = await getPool();
   const [rows] = await pool.execute(
     `SELECT DiaSemana, HoraInicio, HoraFin 
      FROM HorarioDisponible 
