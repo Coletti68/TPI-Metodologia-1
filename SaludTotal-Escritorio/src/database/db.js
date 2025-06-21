@@ -21,7 +21,7 @@ function getConnection() {
   return pool;
 }
 
-function getPool() {
+async function getPool() {
   if (!pool) throw new Error('⚠️ No se ha establecido la conexión a la base de datos.');
   return pool;
 }

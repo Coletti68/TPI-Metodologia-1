@@ -6,6 +6,7 @@ async function obtenerTurnosPorProfesional(desde, hasta, profesionalId = null) {
     let query = `
         SELECT 
             t.FechaTurno AS fecha,
+            t.HoraTurno AS hora,
             p.nombre_completo AS paciente,
             pr.nombre_completo AS profesional,
             e.nombreEspecialidad AS especialidad,

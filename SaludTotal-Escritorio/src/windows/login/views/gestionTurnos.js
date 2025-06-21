@@ -28,6 +28,7 @@ async function cargarTurnos(estado = "") {
                 <td>
                     <button onclick="confirmarTurno(${turno.id_turno})">Confirmar</button>
                     <button onclick="cancelarTurno(${turno.id_turno})">Cancelar</button>
+                    <button onclick="marcarAtendidoTurno(${turno.id_turno})">Atendido</button>
                     <button onclick="reprogramarTurno(${turno.id_turno})">Reprogramar</button>
                 </td>
             `;
@@ -54,6 +55,14 @@ async function cancelarTurno(id) {
     if (!confirmar) return;
 
     await window.electronAPI.actualizarEstadoTurno(id, 'Cancelado');
+    cargarTurnos();
+}
+
+async function marcarAtendidoTurno(id) {
+    const confirmar = confirm('¿Estás seguro que deseas marcar como atendido este turno?');
+    if (!confirmar) return;
+
+    await window.electronAPI.actualizarEstadoTurno(id, 'Atendido');
     cargarTurnos();
 }
 

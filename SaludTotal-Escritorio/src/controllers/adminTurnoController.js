@@ -2,7 +2,7 @@ const { getPool } = require('../database/db');
 
 // Obtener todos los turnos
 async function obtenerTurnos(estado = null) {
-  const pool = getPool();
+  const pool = await getPool();
 
   let query = `
     SELECT t.id_turno, t.FechaTurno AS fecha, t.HoraTurno AS hora, t.estado, 
@@ -32,10 +32,13 @@ async function actualizarEstadoTurno(idTurno, nuevoEstado) {
   return { success: true };
 }
 
-// Reprogramar turno
+// Reprogramar turno y actualizar estado
 async function reprogramarTurno(idTurno, nuevaFecha, nuevaHora) {
   const pool = getPool();
-  await pool.execute('UPDATE Turno SET FechaTurno = ?, HoraTurno = ? WHERE id_turno = ?', [nuevaFecha, nuevaHora, idTurno]);
+  await pool.execute(
+    'UPDATE Turno SET FechaTurno = ?, HoraTurno = ?, estado = ? WHERE id_turno = ?',
+    [nuevaFecha, nuevaHora, 'Reprogramado', idTurno]
+  );
   return { success: true };
 }
 

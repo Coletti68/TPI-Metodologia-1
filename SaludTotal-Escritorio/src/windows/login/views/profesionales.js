@@ -1,17 +1,15 @@
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   cargarProfesionales();
   cargarEspecialidades();
   cargarRoles();
 });
 
-// Función para cargar profesionales en la tabla
+// Cargar profesionales
 async function cargarProfesionales() {
   try {
     const profesionales = await window.electronAPI.obtenerProfesionales();
     const tbody = document.querySelector('#tablaProfesionales tbody');
     tbody.innerHTML = '';
-
-    console.log('👀 Profesionales cargados:', profesionales);
 
     profesionales.forEach(p => {
       const fila = document.createElement('tr');
@@ -25,7 +23,7 @@ async function cargarProfesionales() {
         <td>${p.rol || 'Sin rol'}</td>
         <td>${p.estado === 1 ? 'Activo' : 'Inactivo'}</td>
         <td>
-          <button onclick="editarProfesional(${p.id_profesional})" style="margin-right: 8px;">Editar</button>
+          <button onclick="editarProfesional(${p.id_profesional})">Editar</button>
           <button onclick="eliminarProfesional(${p.id_profesional})" style="background-color:rgb(167, 37, 33); color: white;">Eliminar</button>
         </td>
       `;
@@ -56,21 +54,21 @@ async function cargarProfesionales() {
   }
 }
 
-// Mostrar el modal
+// Mostrar modal
 document.getElementById('btnAgregarProfesional').addEventListener('click', () => {
   document.getElementById('modalAgregar').style.display = 'flex';
 });
 
-// Cerrar el modal
+// Cerrar modal
 function cerrarModal() {
   document.getElementById('modalAgregar').style.display = 'none';
   document.getElementById('formNuevoProfesional').reset();
+  document.getElementById('contenedorHorarios').innerHTML = '';
 }
 
+// Agregar horario dinámico
 function agregarHorario() {
   const contenedor = document.getElementById('contenedorHorarios');
-  const index = contenedor.querySelectorAll('.horario-item').length;
-
   const dias = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
 
   const div = document.createElement('div');
@@ -91,14 +89,17 @@ function agregarHorario() {
 document.getElementById('formNuevoProfesional').addEventListener('submit', async (e) => {
   e.preventDefault();
 
+  const especialidades = Array.from(document.getElementById('especialidad').selectedOptions).map(opt => parseInt(opt.value));
+
   const nuevoProfesional = {
     dni: document.getElementById('dni').value.trim(),
     nombre_completo: document.getElementById('nombre_completo').value.trim(),
     sexo: document.getElementById('sexo').value,
     email: document.getElementById('email').value.trim(),
     password: document.getElementById('password').value.trim(),
-    especialidad_id: parseInt(document.getElementById('especialidad').value),
-    rol_id: parseInt(document.getElementById('rol').value)
+    rol_id: parseInt(document.getElementById('rol').value),
+    especialidades,
+    horarios: []
   };
 
   // Validaciones
@@ -107,10 +108,26 @@ document.getElementById('formNuevoProfesional').addEventListener('submit', async
     return;
   }
 
-  if (isNaN(nuevoProfesional.especialidad_id) || isNaN(nuevoProfesional.rol_id)) {
-    alert("Seleccione una especialidad y un rol válidos.");
+  if (especialidades.length === 0 || isNaN(nuevoProfesional.rol_id)) {
+    alert("Seleccione al menos una especialidad y un rol válido.");
     return;
   }
+
+  // Capturar horarios
+  document.querySelectorAll('.horario-item').forEach(item => {
+    const DiaSemana = item.querySelector('select[name="diaSemana"]').value;
+    const HoraInicio = item.querySelector('input[name="horaInicio"]').value;
+    const HoraFin = item.querySelector('input[name="horaFin"]').value;
+
+    if (DiaSemana && HoraInicio && HoraFin) {
+      nuevoProfesional.horarios.push({
+        especialidad_id: especialidades[0], // Asignamos la principal
+        DiaSemana,
+        HoraInicio,
+        HoraFin
+      });
+    }
+  });
 
   try {
     await window.electronAPI.agregarProfesional(nuevoProfesional);
@@ -120,36 +137,21 @@ document.getElementById('formNuevoProfesional').addEventListener('submit', async
     console.error("❌ Error al guardar profesional:", error);
     alert("Ocurrió un error al guardar el profesional.");
   }
-
-  // Capturar horarios
-const horarios = [];
-document.querySelectorAll('.horario-item').forEach(item => {
-  const dia = item.querySelector('select[name="diaSemana"]').value;
-  const inicio = item.querySelector('input[name="horaInicio"]').value;
-  const fin = item.querySelector('input[name="horaFin"]').value;
-
-  if (dia && inicio && fin) {
-    horarios.push({ dia, inicio, fin });
-  }
 });
 
-nuevoProfesional.horarios = horarios;
-
-});
-
-// Recarga la tabla
+// Recargar tabla
 async function recargarTablaProfesionales() {
   const tabla = $('#tablaProfesionales').DataTable();
   tabla.destroy();
   await cargarProfesionales();
 }
 
-// Cargar especialidades en el <select>
+// Cargar especialidades
 async function cargarEspecialidades() {
   try {
     const especialidades = await window.electronAPI.obtenerEspecialidades();
     const select = document.getElementById('especialidad');
-    select.innerHTML = `<option value="">Seleccione una especialidad</option>`;
+    select.innerHTML = `<option value="">Seleccione una o más especialidades</option>`;
     especialidades.forEach(esp => {
       const option = document.createElement('option');
       option.value = esp.id_especialidad;
@@ -161,6 +163,7 @@ async function cargarEspecialidades() {
   }
 }
 
+// Cargar roles
 async function cargarRoles() {
   try {
     const roles = await window.electronAPI.obtenerRoles();

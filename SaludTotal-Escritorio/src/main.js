@@ -9,7 +9,8 @@ const { obtenerPacientes } = require('./controllers/pacientecontroller');
 const { 
   obtenerProfesionales, 
   obtenerEspecialidades, 
-  obtenerRoles 
+  obtenerRoles,
+  crearProfesional
 } = require('./controllers/profesionalcontroller');
 const { 
   obtenerTurnos, 
@@ -132,61 +133,37 @@ function configurarIPC() {
     }
   });
 
-  ipcMain.handle('agregarProfesional', async (_, profesional) => {
-    const pool = getPool();
-    const conn = await pool.getConnection();
-    try {
-      await conn.beginTransaction();
+  
+// Agregar profesional (usando el controller actualizado)
+ipcMain.handle('agregarProfesional', async (_, profesional) => {
+  try {
+    return await crearProfesional(profesional);
+  } catch (err) {
+    console.error("❌ Error al agregar profesional:", err.message);
+    throw err;
+  }
+});
 
-      const { dni, nombre_completo, sexo, email, password, especialidad_id, rol_id, horarios } = profesional;
+// Obtener especialidades
+ipcMain.handle('obtenerEspecialidades', async () => {
+  try {
+    return await obtenerEspecialidades();
+  } catch (err) {
+    console.error('❌ Error al obtener especialidades:', err.message);
+    throw err;
+  }
+});
 
-      const [result] = await conn.execute(`
-        INSERT INTO Profesional (dni, nombre_completo, sexo, email, password, especialidad_id, rol_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `, [dni, nombre_completo, sexo, email, password, especialidad_id, rol_id]);
+// Obtener roles
+ipcMain.handle('obtenerRoles', async () => {
+  try {
+    return await obtenerRoles();
+  } catch (err) {
+    console.error('❌ Error al obtener roles:', err.message);
+    throw err;
+  }
+});
 
-      const profesionalId = result.insertId;
-
-      await conn.execute(`
-        INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id)
-        VALUES (?, ?)
-      `, [profesionalId, especialidad_id]);
-
-      for (const h of horarios) {
-        await conn.execute(`
-          INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin)
-          VALUES (?, ?, ?, ?, ?)
-        `, [profesionalId, especialidad_id, h.dia, h.inicio, h.fin]);
-      }
-
-      await conn.commit();
-      return { success: true };
-    } catch (err) {
-      await conn.rollback();
-      console.error("❌ Error al agregar profesional con horarios:", err.message);
-      throw err;
-    } finally {
-      conn.release();
-    }
-  });
-
-  ipcMain.handle('obtenerEspecialidades', async () => {
-    try {
-      return await obtenerEspecialidades();
-    } catch (err) {
-      console.error('❌ Error al obtener especialidades:', err.message);
-      throw err;
-    }
-  });
-
-  ipcMain.handle('obtenerRoles', async () => {
-    try {
-      return await obtenerRoles();
-    } catch (err) {
-      console.error('❌ Error al obtener roles:', err.message);
-      throw err;
-    }
-  });
 
   // =========
   // TURNOS
