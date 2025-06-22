@@ -5,7 +5,11 @@ const fs = require('fs');
 // DB y controladores
 const { conectar, getPool } = require('./database/db');
 const { login } = require('./controllers/authController');
-const { obtenerPacientes } = require('./controllers/pacientecontroller');
+const { obtenerPacientes,
+editarPaciente,
+inactivarPaciente,
+obtenerHistorialTurnos
+} = require('./controllers/pacientecontroller');
 const { 
   obtenerProfesionales, 
   obtenerEspecialidades, 
@@ -121,6 +125,35 @@ function configurarIPC() {
     }
   });
 
+  
+  ipcMain.handle('editarPaciente', async (event, id, datos) => {
+    try {
+      return await editarPaciente(id, datos);
+    } catch (error) {
+      console.error('❌ Error al editar paciente:', error.message);
+      throw error;
+    }
+  });
+
+  ipcMain.handle('inactivarPaciente', async (event, id) => {
+    try {
+      return await inactivarPaciente(id);
+    } catch (error) {
+      console.error('❌ Error al inactivar paciente:', error.message);
+      throw error;
+    }
+  });
+  
+  ipcMain.handle('obtenerHistorialTurnos', async (event, pacienteId) => {
+    try {
+      return await obtenerHistorialTurnos(pacienteId);
+    } catch (error) {
+      console.error('❌ Error al obtener historial de turnos:', error.message);
+      throw error;
+    }
+  });
+
+ 
   // =====================
   // PROFESIONALES Y ROLES
   // =====================
@@ -136,22 +169,22 @@ function configurarIPC() {
   
 // Agregar profesional (usando el controller actualizado)
 ipcMain.handle('agregarProfesional', async (_, profesional) => {
-  try {
-    return await crearProfesional(profesional);
-  } catch (err) {
-    console.error("❌ Error al agregar profesional:", err.message);
-    throw err;
-  }
+  try {
+   return await crearProfesional(profesional);
+  } catch (err) {
+    console.error("❌ Error al agregar profesional:", err.message);
+    throw err;
+  }
 });
 
 // Obtener especialidades
 ipcMain.handle('obtenerEspecialidades', async () => {
-  try {
-    return await obtenerEspecialidades();
-  } catch (err) {
-    console.error('❌ Error al obtener especialidades:', err.message);
-    throw err;
-  }
+  try {
+    return await obtenerEspecialidades();
+  } catch (err) {
+    console.error('❌ Error al obtener especialidades:', err.message);
+    throw err;
+  }
 });
 
 // Obtener roles

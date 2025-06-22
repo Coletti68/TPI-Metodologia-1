@@ -1,14 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  // Autenticación y navegación
   login: (credentials) => ipcRenderer.invoke('login', credentials),
   getUsuario: () => ipcRenderer.invoke('getUsuario'),
   abrirModulo: (modulo) => ipcRenderer.invoke('abrirModulo', modulo),
- 
-  
+
+  // Contacto y turnos
   obtenerMensajesContacto: () => ipcRenderer.invoke('obtenerMensajesContacto'),
   marcarContactoRespondido: (id) => ipcRenderer.invoke('marcarContactoRespondido', id),
-  obtenerHorariosDisponibles: (profesionalId, especialidadId) => ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
+  obtenerHorariosDisponibles: (profesionalId, especialidadId) =>
+    ipcRenderer.invoke('obtenerHorariosDisponibles', profesionalId, especialidadId),
   obtenerTurnos: (estado) => ipcRenderer.invoke('obtenerTurnos', estado),
   actualizarEstadoTurno: (id, estado) => ipcRenderer.invoke('actualizarEstadoTurno', id, estado),
   reprogramarTurno: (id, fecha, hora) => ipcRenderer.invoke('reprogramarTurno', id, fecha, hora),
@@ -17,23 +19,23 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
   // Pacientes y profesionales
   obtenerPacientes: () => ipcRenderer.invoke('obtenerPacientes'),
+  editarPaciente: (id, datos) => ipcRenderer.invoke('editarPaciente', id, datos),
+  inactivarPaciente: (id) => ipcRenderer.invoke('inactivarPaciente', id),
+  obtenerHistorialTurnos: (id) => ipcRenderer.invoke('obtenerHistorialTurnos', id),
   obtenerProfesionales: () => ipcRenderer.invoke('obtenerProfesionales'),
-  obtenerTurnosPorProfesional: (desde, hasta, profesionalId) => ipcRenderer.invoke('obtenerTurnosPorProfesional', desde, hasta, profesionalId),
+  obtenerTurnosPorProfesional: (desde, hasta, profesionalId) =>
+    ipcRenderer.invoke('obtenerTurnosPorProfesional', desde, hasta, profesionalId),
 
-  // Agregado necesario
+  // Profesionales
   agregarProfesional: (datos) => ipcRenderer.invoke('agregarProfesional', datos),
   obtenerEspecialidades: () => ipcRenderer.invoke('obtenerEspecialidades'),
   obtenerRoles: () => ipcRenderer.invoke('obtenerRoles'),
-  
   obtenerHorariosPorDia: (profesionalId, especialidadId, diaSemana) =>
-  ipcRenderer.invoke('obtenerHorariosPorDia', profesionalId, especialidadId, diaSemana),
+    ipcRenderer.invoke('obtenerHorariosPorDia', profesionalId, especialidadId, diaSemana),
 
-  // Modal (opcional si lo manejás por HTML directamente)
+  // Modal (opcional)
   abrirFormularioAgregarProfesional: () => ipcRenderer.invoke('abrirFormularioAgregarProfesional')
-  
-  
 });
-
 
 // Simulación temporal de rol
 const rolUsuario = 'secretaria';
