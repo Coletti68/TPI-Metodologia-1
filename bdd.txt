@@ -1,0 +1,147 @@
+CREATE DATABASE SaludTotalBDD;
+
+USE SaludTotalBDD;
+
+CREATE TABLE Rol (
+  id_rol INT PRIMARY KEY AUTO_INCREMENT,
+  nombreRol ENUM('admin', 'profesional', 'paciente', 'secretaria')
+);
+
+CREATE TABLE Paciente (
+    id_paciente INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    dni VARCHAR(8) UNIQUE NOT NULL,
+    sexo ENUM('M', 'F') NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    rol_id INT NOT NULL DEFAULT 3, -- Asumiendo que 'paciente' tiene id_rol=3
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
+);
+
+CREATE TABLE Especialidad (
+    id_especialidad INT AUTO_INCREMENT PRIMARY KEY,
+    nombreEspecialidad VARCHAR(100) NOT NULL UNIQUE,
+    estado INT DEFAULT 1 -- 1: Activo, 0: Inactivo
+
+);
+
+CREATE TABLE Profesional (
+    id_profesional INT AUTO_INCREMENT PRIMARY KEY,
+    nombre_completo VARCHAR(100) NOT NULL,
+    especialidad_id INT NOT NULL,
+    dni VARCHAR(8) UNIQUE NOT NULL,
+    sexo ENUM('M', 'F') NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    estado INT DEFAULT 1, -- 1: activo
+    rol_id INT NOT NULL DEFAULT 2, -- Asumiendo que 'profesional' tiene id_rol=2
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES Rol(id_rol)
+
+);
+
+CREATE TABLE ProfesionalEspecialidad (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    profesional_id INT NOT NULL UNIQUE,
+    especialidad_id INT NOT NULL ,
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional) ON DELETE CASCADE,
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad) ON DELETE CASCADE
+);
+
+CREATE TABLE Turno (
+    id_turno INT AUTO_INCREMENT PRIMARY KEY,
+    paciente_id INT NOT NULL,
+    profesional_id INT NOT NULL,
+    especialidad_id INT NOT NULL,
+    FechaTurno DATE NOT NULL,
+    HoraTurno TIME NOT NULL,
+    estado ENUM('En espera', 'Confirmado', 'Cancelado', 'Atendido', 'Rechazado', 'Reprogramado') DEFAULT 'En espera',
+    FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente),
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
+);
+
+CREATE TABLE HorarioDisponible (
+    id_horario INT AUTO_INCREMENT PRIMARY KEY,
+    profesional_id INT NOT NULL,
+    especialidad_id INT NOT NULL,
+    DiaSemana ENUM('Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado') NOT NULL,
+    HoraInicio TIME NOT NULL,
+    HoraFin TIME NOT NULL,
+    FOREIGN KEY (profesional_id) REFERENCES Profesional(id_profesional),
+    FOREIGN KEY (especialidad_id) REFERENCES Especialidad(id_especialidad)
+);
+
+CREATE TABLE HistorialTurno (
+  id_historial INT PRIMARY KEY AUTO_INCREMENT,
+  turno_id INT NOT NULL,
+  paciente_id INT NOT NULL,
+  estado_nuevo ENUM('Confirmado', 'Cancelado', 'Reprogramado', 'Rechazado', 'En espera', 'Atendido') NOT NULL,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (turno_id) REFERENCES Turno(id_turno),
+  FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente)
+);
+
+CREATE TABLE Contacto (
+  id_contacto INT PRIMARY KEY AUTO_INCREMENT,
+  paciente_id INT,
+  email VARCHAR(100) NOT NULL,
+  motivo ENUM('Sugerencia', 'Problema tecnico', 'Queja o Reclamo', 'Otro') NOT NULL,
+  mensaje TEXT NOT NULL,
+  fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (paciente_id) REFERENCES Paciente(id_paciente),
+  respondido BOOLEAN DEFAULT FALSE
+);
+
+INSERT INTO Rol (id_rol, nombreRol) VALUES 
+(1, 'admin'), (2, 'profesional'), (3, 'paciente'), (4, 'secretaria');
+
+INSERT INTO Especialidad (nombreEspecialidad) VALUES 
+('Clínica General'),
+('Pediatría'),
+('Cardiología'),
+('Ginecología');
+
+INSERT INTO Profesional 
+(nombre_completo, especialidad_id, dni, sexo, email, password) 
+VALUES  
+('Dr. Carlos Diaz', 1, '12345678', 'M', 'cdiaz@example.com', 'hashed_password1'),
+('Dr. Lisandro López', 2, '87654321', 'M', 'llopez@example.com', 'hashed_password2'),
+('Dr. Pablo Perez', 3, '11223344', 'M', 'pperez@example.com', 'hashed_password3'),
+('Dra. Marisa Torales', 4, '44332211', 'F', 'mtorales@example.com', 'hashed_password4');
+
+INSERT INTO Profesional (nombre_completo, dni, sexo, email, password, rol_id, especialidad_id)
+VALUES ('Admin Test', '11223343', 'M', 'admin@saludtotal.com', '1234', 1, 1);
+
+INSERT INTO ProfesionalEspecialidad (profesional_id, especialidad_id) VALUES 
+(1, 1), 
+(4, 4),  -- Juan Pérez (Clínica General y Ginecología)
+(2, 2),
+(3, 3);  -- Ana López (Pediatría y Cardiología)
+
+INSERT INTO HorarioDisponible (profesional_id, especialidad_id, DiaSemana, HoraInicio, HoraFin) VALUES  
+(1, 1, 'Lunes', '09:00:00', '12:00:00'),  
+(1, 1, 'Miércoles', '14:00:00', '18:00:00'),  
+(2, 2, 'Martes', '08:00:00', '12:00:00'),  
+(2, 2, 'Jueves', '16:00:00', '20:00:00'),  
+(3, 3, 'Jueves', '10:00:00', '15:00:00'),  
+(3, 3, 'Lunes', '15:00:00', '21:00:00'),  
+(4, 4, 'Viernes', '09:30:00', '13:30:00'), 
+(4, 4, 'Martes', '15:30:00', '21:30:00');
+
+-- Turno
+CREATE INDEX idx_turno_profesional ON Turno(profesional_id);
+CREATE INDEX idx_turno_paciente ON Turno(paciente_id);
+CREATE INDEX idx_turno_estado ON Turno(estado);
+CREATE INDEX idx_turno_fecha ON Turno(FechaTurno);
+
+-- HistorialTurnos
+CREATE INDEX idx_historial_paciente ON HistorialTurno(paciente_id);
+CREATE INDEX idx_historial_turno ON HistorialTurno(turno_id);
+
+-- HorarioDisponible
+CREATE INDEX idx_horario_profesional ON HorarioDisponible(profesional_id);

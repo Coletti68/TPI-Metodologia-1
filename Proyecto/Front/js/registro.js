@@ -8,7 +8,7 @@ document.querySelector('form').addEventListener('submit', async function (e) {
   const password = document.getElementById('password').value;
   const sexo = document.getElementById('sexo').value; // NUEVO
 
-  const response = await fetch('http://192.168.1.38:3000/api/pacientes/register', { // RUTA CORREGIDA
+  const response = await fetch('http://192.168.1.43:3000/api/pacientes/register', { // RUTA CORREGIDA
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ nombre_completo: nombre, dni, email, password, sexo }) // AGREGA SEXO

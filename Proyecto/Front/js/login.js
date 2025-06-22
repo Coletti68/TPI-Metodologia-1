@@ -6,7 +6,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   const password = document.getElementById('password').value;
 
   try {
-    const response = await fetch('http://192.168.1.38:3000/api/pacientes/login', {
+    const response = await fetch('http://192.168.1.43:3000/api/pacientes/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ dni, password })
