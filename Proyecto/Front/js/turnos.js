@@ -128,7 +128,7 @@ async function enviarTurno(e) {
     const data = await res.json();
 
     if (res.ok) {
-      alert("✅ Turno confirmado");
+      alert("✅ Turno solicitado con exito");
       document.getElementById("form-turno").reset();
     } else if (res.status === 409) {
       alert("⚠️ Ese turno ya está ocupado. Elegí otro horario.");

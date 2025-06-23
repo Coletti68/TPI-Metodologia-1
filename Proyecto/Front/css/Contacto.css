@@ -1,6 +1,10 @@
 /* General */
 body {
   margin: 0;
+  background-image: url('/images/slider2.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   background-color: #e6f2ff; /* Celeste claro */
 }

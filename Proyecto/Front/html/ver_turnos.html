@@ -121,8 +121,8 @@ p, span, li {
         const response = await fetch(`/api/turnos/historial/${pacienteId}`);
         const turnos = await response.json();
 
-        const activos = turnos.filter(t => ['En espera', 'Confirmado'].includes(t.estado));
-        const historico = turnos.filter(t => t.estado === 'Atendido' || t.estado === 'Cancelado');
+        const activos = turnos.filter(t => ['En espera', 'Confirmado', 'Reprogramado'].includes(t.estado));
+        const historico = turnos.filter(t => ['Atendido', 'Cancelado', 'Rechazado'].includes(t.estado));
 
         renderTurnos(activos, "turnos-activos", true);
         renderTurnos(historico, "turnos-historial", false);
