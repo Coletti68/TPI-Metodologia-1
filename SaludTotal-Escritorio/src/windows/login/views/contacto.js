@@ -2,8 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
   cargarContactos();
 });
 
-let contactoSeleccionado = null;
-
 async function cargarContactos() {
   const contactos = await window.electronAPI.obtenerContactos();
   const tbody = document.getElementById('tbodyContacto');
@@ -20,31 +18,29 @@ async function cargarContactos() {
       <td>${new Date(contacto.fecha).toLocaleString()}</td>
       <td>${contacto.respondido ? 'Sí' : 'No'}</td>
       <td>
-        ${contacto.respondido ? '-' : `<button onclick="mostrarFormulario(${contacto.id_contacto}, '${contacto.email}')">Responder</button>`}
+        ${contacto.respondido ? '-' : `<button onclick="marcarRespondido(${contacto.id_contacto})">Marcar como respondido</button>`}
       </td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-function mostrarFormulario(id, email) {
-  contactoSeleccionado = { id, email };
-  document.getElementById('infoContacto').innerText = `Responder a: ${email}`;
-  document.getElementById('respuestaMensaje').value = '';
-  document.getElementById('formRespuesta').style.display = 'block';
-}
+async function marcarRespondido(id) {
+  try {
+    await window.electronAPI.responderContacto(id);
 
-function cancelar() {
-  contactoSeleccionado = null;
-  document.getElementById('formRespuesta').style.display = 'none';
-}
+    // Actualizar directamente la fila afectada
+    const fila = [...document.querySelectorAll('#tbodyContacto tr')]
+      .find(tr => tr.firstElementChild.textContent == id);
 
-async function enviarRespuesta() {
-  const respuesta = document.getElementById('respuestaMensaje').value.trim();
-  if (!respuesta) return alert("La respuesta no puede estar vacía.");
+    if (fila) {
+      fila.children[6].textContent = 'Sí'; // Columna "Respondido"
+      fila.children[7].innerHTML = '-';    // Quitar botón
+    }
 
-  await window.electronAPI.responderContacto(contactoSeleccionado.id, respuesta);
-  alert("Respuesta enviada.");
-  cancelar();
-  cargarContactos();
+    alert("Contacto marcado como respondido.");
+  } catch (e) {
+    console.error(e);
+    alert("Error al actualizar estado.");
+  }
 }

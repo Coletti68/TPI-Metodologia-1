@@ -269,35 +269,43 @@ ipcMain.handle('obtenerRoles', async () => {
     }
   });
 
-  // ==========================
-  // CONTACTO (Mensajes y Respuestas)
-  // ==========================
-  ipcMain.handle('obtenerMensajesContacto', async () => {
-    try {
-      return await contactoController.obtenerMensajesContacto();
-    } catch (error) {
-      console.error('Error al obtener mensajes:', error);
-      throw error;
-    }
-  });
+// ==========================
+// CONTACTO (Mensajes y Respuestas)
+// ==========================
+ipcMain.handle('obtenerMensajesContacto', async () => {
+  try {
+    return await contactoController.obtenerMensajesContacto();
+  } catch (error) {
+    console.error('Error al obtener mensajes:', error);
+    throw error;
+  }
+});
 
-  ipcMain.handle('marcarContactoRespondido', async (_, id_contacto) => {
-    try {
-      await contactoController.marcarMensajeRespondido(id_contacto);
-      return { ok: true };
-    } catch (error) {
-      console.error('Error al marcar como respondido:', error);
-      throw error;
-    }
-  });
+ipcMain.handle('marcarContactoRespondido', async (_, id_contacto) => {
+  try {
+    await contactoController.marcarMensajeRespondido(id_contacto);
+    return { ok: true };
+  } catch (error) {
+    console.error('Error al marcar como respondido:', error);
+    throw error;
+  }
+});
 
-  ipcMain.handle('obtenerContactos', async () => {
-    return await contactoController.obtenerTodos();
-  });
+ipcMain.handle('obtenerContactos', async () => {
+  return await contactoController.obtenerTodos();
+});
 
-  ipcMain.handle('responderContacto', async (_, id, respuesta) => {
-    return await contactoController.responder(id, respuesta);
-  });
+// ✅ Este es el que tenés que modificar
+ipcMain.handle('responderContacto', async (_, id) => {
+  try {
+    // Solo marcar como respondido
+    return await contactoController.responder(id);
+  } catch (error) {
+    console.error('Error al marcar contacto como respondido:', error);
+    throw error;
+  }
+});
+
 }
 
 // Cierre de app

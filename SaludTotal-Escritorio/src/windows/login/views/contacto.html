@@ -4,15 +4,78 @@
   <meta charset="UTF-8">
   <title>Gestión de Contactos</title>
   <style>
-    body { font-family: Arial; margin: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-    th { background-color: #f2f2f2; }
-    textarea { width: 100%; height: 100px; }
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 20px;
+  background-color: #e6f0fa; /* celeste muy suave */
+  color: #204060; /* azul oscuro */
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #1761a0; /* azul celeste intenso */
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #d7e6f9; /* celeste claro */
+  box-shadow: 0 4px 8px rgba(23, 97, 160, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+th, td {
+  border: 1px solid #a9c1e8; /* borde celeste */
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #1761a0; /* azul celeste intenso */
+  font-weight: bold;
+  color: #ffffff; /* texto blanco */
+}
+
+tr:nth-child(even) {
+  background-color: #bdd7f7; /* celeste medio */
+}
+
+tr:hover {
+  background-color: #a0c0f0; /* celeste un poco más intenso al pasar el mouse */
+}
+
+button {
+  padding: 6px 12px;
+  background-color: #1761a0; /* azul celeste intenso */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0f3c6e; /* azul más oscuro */
+}
+
+button:disabled {
+  background-color: #7ea0c9; /* celeste grisáceo */
+  cursor: default;
+}
+
   </style>
 </head>
 <body>
   <h1>Mensajes de Contacto</h1>
+
   <table id="tablaContacto">
     <thead>
       <tr>
@@ -28,14 +91,6 @@
     </thead>
     <tbody id="tbodyContacto"></tbody>
   </table>
-
-  <div id="formRespuesta" style="display:none;">
-    <h2>Responder mensaje</h2>
-    <p id="infoContacto"></p>
-    <textarea id="respuestaMensaje" placeholder="Escribe tu respuesta..."></textarea><br>
-    <button onclick="enviarRespuesta()">Enviar respuesta</button>
-    <button onclick="cancelar()">Cancelar</button>
-  </div>
 
   <script src="./contacto.js"></script>
 </body>
