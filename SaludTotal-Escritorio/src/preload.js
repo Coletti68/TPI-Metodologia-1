@@ -20,6 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   obtenerPacientes: () => ipcRenderer.invoke('obtenerPacientes'),
   editarPaciente: (id, datos) => ipcRenderer.invoke('editarPaciente', id, datos),
   inactivarPaciente: (id) => ipcRenderer.invoke('inactivarPaciente', id),
+  activarPaciente: (id) => ipcRenderer.invoke('activarPaciente', id),
   obtenerHistorialTurnos: (id) => ipcRenderer.invoke('obtenerHistorialTurnos', id),
   obtenerProfesionales: () => ipcRenderer.invoke('obtenerProfesionales'),
   obtenerTurnosPorProfesional: (desde, hasta, profesionalId) =>

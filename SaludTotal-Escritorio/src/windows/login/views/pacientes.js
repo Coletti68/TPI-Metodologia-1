@@ -42,7 +42,7 @@ window.addEventListener('DOMContentLoaded', async () => {
           <td>${p.nombre_completo}</td>
           <td>${p.sexo}</td>
           <td>${p.email}</td>
-          <td>${p.estado === 'activo' ? 'Activo' : 'Inactivo'}</td>
+          <td>${p.estado_texto}</td>
         `;
       } else {
         fila += `
@@ -54,7 +54,9 @@ window.addEventListener('DOMContentLoaded', async () => {
       fila += `
         <td>
           <button onclick="editarPaciente(${p.id_paciente})">Editar</button>
-          <button onclick="eliminarPaciente(${p.id_paciente})" style="background-color:rgb(167, 37, 33); color: white; border: none; padding: 8px 10px; font-size: 15px; border-radius: 4px;">Eliminar</button>
+          <button onclick="inactivarPaciente(${p.id_paciente})">Inactivar</button>
+<button onclick="activarPaciente(${p.id_paciente})">Activar</button>
+
           <button onclick="verHistorial(${p.id_paciente})">Ver Historial</button>
         </td>
       `;
@@ -104,8 +106,20 @@ async function editarPaciente(id) {
   }
 }
 
-// Función para inactivar paciente
-async function eliminarPaciente(id) {
+async function activarPaciente(id) {
+  if (!confirm("¿Estás seguro de que querés activar este paciente?")) return;
+
+  try {
+    await window.electronAPI.activarPaciente(id);
+    alert("Paciente activado correctamente");
+    location.reload();
+  } catch (error) {
+    console.error("Error al activar paciente:", error);
+    alert("Error al activar paciente");
+  }
+}
+
+async function inactivarPaciente(id) {
   if (!confirm("¿Estás seguro de que querés inactivar este paciente?")) return;
 
   try {
@@ -117,6 +131,7 @@ async function eliminarPaciente(id) {
     alert("Error al inactivar paciente");
   }
 }
+
 
 // Función para ver historial de turnos
 async function verHistorial(id) {

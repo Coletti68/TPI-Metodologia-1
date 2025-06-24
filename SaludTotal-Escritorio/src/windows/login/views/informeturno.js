@@ -55,10 +55,10 @@ function establecerFechasPorDefecto() {
     const inputHasta = document.getElementById('fechaHasta');
 
     inputDesde.value = fechaDesde;
-    inputDesde.max = fechaHasta;
+    //inputDesde.max = fechaHasta;
 
     inputHasta.value = fechaHasta;
-    inputHasta.max = fechaHasta;
+   // inputHasta.max = fechaHasta;
 }
 
 function cargarTabla(turnos) {

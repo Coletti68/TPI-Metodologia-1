@@ -15,10 +15,10 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../Front/html/Home_No_Login.html'));
 });
 
-// 🔁 Función asíncrona para iniciar el servidor y conectar a la BD
+
 async function startServer() {
   try {
-    await db.conectar(); // ✅ Establecer conexión al pool
+    await db.conectar(); 
 
     // import Rutas
     const patientRoutes = require('./Routes/patientRoutes');
@@ -33,7 +33,7 @@ async function startServer() {
     app.use('/api/historial', historialRoutes);
 
     app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Servidor corriendo en http://0.0.0.0:${PORT}`);
+  console.log(`🚀 Servidor corriendo en http://192.168.0.113:${PORT}`);
 });
   } catch (err) {
     console.error('❌ Error al conectar a la base de datos:', err.message);

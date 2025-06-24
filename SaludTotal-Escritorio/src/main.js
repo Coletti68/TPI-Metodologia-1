@@ -8,6 +8,7 @@ const { login } = require('./controllers/authController');
 const { obtenerPacientes,
 editarPaciente,
 inactivarPaciente,
+activarPaciente,
 obtenerHistorialTurnos
 } = require('./controllers/pacientecontroller');
 const { 
@@ -134,6 +135,16 @@ function configurarIPC() {
       throw error;
     }
   });
+
+ipcMain.handle('activarPaciente', async (event, id) => {
+  try {
+    return await activarPaciente(id);
+  } catch (error) {
+    console.error('❌ Error al activar paciente:', error.message);
+    throw error;
+  }
+});
+
 
   ipcMain.handle('inactivarPaciente', async (event, id) => {
     try {
